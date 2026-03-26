@@ -3,20 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ZEN SYSTEM - Hatha Flow 1.1</title>
+    <title>ZEN SYSTEM - Hatha Flow & Cardio</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         :root {
-            --zen-green: #7b9e87; /* Salvia scuro */
-            --zen-light-green: #a3c4b0; /* Salvia chiaro */
-            --zen-bg: #fdfaf6; /* Bianco panna caldo */
+            --zen-green: #7b9e87; 
+            --zen-light-green: #a3c4b0; 
+            --zen-bg: #fdfaf6; 
             --zen-panel: #ffffff;
             --zen-text: #4a4a4a;
-            --zen-accent: #d4a373; /* Terra/Beige */
-            --zen-alert: #e07a5f; /* Terracotta morbido */
-            --zen-lavender: #d6cadd; /* Per la zona di riallineamento */
+            --zen-accent: #d4a373; 
+            --zen-lavender: #d6cadd;
+            --zen-fire: #e07a5f; /* Terracotta/Fuoco per il cardio */
+            --zen-fire-light: #fbeae5;
         }
 
         body {
@@ -89,6 +90,17 @@
             border-bottom-color: var(--zen-accent);
         }
 
+        /* Pannello Cardio Cyclette */
+        .cardio-panel {
+            border: 2px dashed var(--zen-fire);
+            background: var(--zen-fire-light);
+        }
+        .cardio-header {
+            color: var(--zen-fire);
+            border-bottom: none;
+            margin-bottom: 0.5rem;
+        }
+
         /* Modalità Riallineamento */
         .penalty-mode {
             background: #fff !important;
@@ -133,10 +145,8 @@
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.05);
         }
 
-        .progress-fill {
-            background: var(--zen-light-green);
-            border-radius: 4px;
-        }
+        .progress-fill { background: var(--zen-light-green); border-radius: 4px; }
+        .progress-fire { background: var(--zen-fire); border-radius: 4px; }
 
         #toast-container { position: fixed; top: 20px; right: 20px; z-index: 100; }
         .toast {
@@ -213,7 +223,7 @@
                 <div class="stat-row">
                     <div>
                         <span class="text-gray-700 font-bold block">STABILITÀ (STB)</span>
-                        <span class="stat-desc">Equilibrio e radicamento (Gambe)</span>
+                        <span class="stat-desc">Equilibrio e radicamento</span>
                     </div>
                     <div class="flex items-center gap-2">
                         <span id="stb-val" class="font-bold text-lg" style="color: var(--zen-green)">1</span>
@@ -223,7 +233,7 @@
                 <div class="stat-row">
                     <div>
                         <span class="text-gray-700 font-bold block">FLESSIBILITÀ (FLX)</span>
-                        <span class="stat-desc">Apertura anche e distensione</span>
+                        <span class="stat-desc">Apertura e distensione</span>
                     </div>
                     <div class="flex items-center gap-2">
                         <span id="flx-val" class="font-bold text-lg" style="color: var(--zen-green)">1</span>
@@ -233,7 +243,7 @@
                 <div class="stat-row">
                     <div>
                         <span class="text-gray-700 font-bold block">PRANA (PRA)</span>
-                        <span class="stat-desc">Mobilità della colonna e respiro</span>
+                        <span class="stat-desc">Mobilità colonna e respiro</span>
                     </div>
                     <div class="flex items-center gap-2">
                         <span id="pra-val" class="font-bold text-lg" style="color: var(--zen-green)">1</span>
@@ -243,7 +253,7 @@
                 <div class="stat-row">
                     <div>
                         <span class="text-gray-700 font-bold block">CONSAPEVOLEZZA (CNS)</span>
-                        <span class="stat-desc">Rilassamento e propriocezione</span>
+                        <span class="stat-desc">Rilassamento e focus</span>
                     </div>
                     <div class="flex items-center gap-2">
                         <span id="cns-val" class="font-bold text-lg" style="color: var(--zen-green)">1</span>
@@ -260,7 +270,7 @@
         </div>
 
         <!-- Hidden Quest Section -->
-        <div id="bonus-quest-panel" class="system-panel p-4 mb-6 hidden-quest-panel hidden">
+        <div id="bonus-quest-panel" class="system-panel p-4 mb-4 hidden-quest-panel hidden">
             <div class="system-header hidden-quest-header flex justify-between items-center text-sm border-none mb-0 pb-2">
                 <span><i class="fas fa-leaf"></i> INTENZIONE DEL GIORNO</span>
                 <span class="text-xs bg-orange-100 px-2 py-1 rounded text-orange-800">Cura di sé</span>
@@ -270,6 +280,19 @@
                 <button onclick="completeBonusQuest()" class="px-6 py-2 border-2 border-orange-300 text-orange-600 hover:bg-orange-50 rounded-full font-bold transition-colors">
                     <i class="fas fa-heart"></i> FATTO
                 </button>
+            </div>
+        </div>
+
+        <!-- Cardio Section (Optional) -->
+        <div id="cardio-panel" class="system-panel cardio-panel p-4 mb-6">
+            <div class="system-header cardio-header flex justify-between items-center text-sm">
+                <span><i class="fas fa-fire"></i> IL FUOCO INTERIORE (CYCLETTE)</span>
+                <span class="text-xs bg-red-100 px-2 py-1 rounded" style="color: var(--zen-fire)">FACOLTATIVO</span>
+            </div>
+            <p class="text-xs text-gray-600 mb-3 text-center">Allenamento cardio per il dimagrimento. Non blocca la pratica Yoga.</p>
+            
+            <div id="cardio-content">
+                <!-- Populated by JS -->
             </div>
         </div>
 
@@ -341,7 +364,7 @@
     </div>
 
     <script>
-        // --- HATHA YOGA EXERCISE DB (Shoulder Safe - V1.1) ---
+        // --- HATHA YOGA EXERCISE DB ---
         const EXERCISE_TIERS = {
             stabilita: [
                 { name: "Posizione della Montagna (Tadasana)", reqStat: "stb", reqVal: 0, base: 5, inc: 1, unit: "respiri" },
@@ -395,14 +418,16 @@
 
         let dailyProgress = {
             date: null, completed: false,
-            exercises: {}, bonusQuest: null
+            exercises: {}, bonusQuest: null,
+            cyclette: null // Nuova funzionalità
         };
 
-        function showToast(message) {
+        function showToast(message, color = "var(--zen-green)") {
             const container = document.getElementById('toast-container');
             const toast = document.createElement('div');
             toast.className = 'toast';
-            toast.innerHTML = `<i class="fas fa-leaf mr-2" style="color: var(--zen-green)"></i> ${message}`;
+            toast.style.borderLeftColor = color;
+            toast.innerHTML = `<i class="fas fa-leaf mr-2" style="color: ${color}"></i> ${message}`;
             container.appendChild(toast);
             setTimeout(() => { toast.remove(); }, 3000);
         }
@@ -423,6 +448,11 @@
             const savedDaily = localStorage.getItem(STORAGE_DAILY);
             if (savedPlayer) player = JSON.parse(savedPlayer);
             if (savedDaily) dailyProgress = JSON.parse(savedDaily);
+
+            // Backward compatibility patch per la cyclette
+            if(dailyProgress && !dailyProgress.cyclette && !dailyProgress.completed) {
+                generateCycletteQuest();
+            }
         }
 
         function saveData() {
@@ -455,8 +485,8 @@
                         saveData();
                         showToast("Dati sincronizzati.");
                         setTimeout(() => location.reload(), 1500);
-                    } else showToast("File non valido.");
-                } catch (err) { showToast("Errore di lettura."); }
+                    } else showToast("File non valido.", "var(--zen-alert)");
+                } catch (err) { showToast("Errore di lettura.", "var(--zen-alert)"); }
             };
             reader.readAsText(file);
         }
@@ -487,11 +517,36 @@
             return variants[0];
         }
 
+        function generateCycletteQuest() {
+            // Logica Cyclette dipendente dal livello
+            let cycTier = 0;
+            if (player.level >= 5) cycTier = 1;
+            if (player.level >= 15) cycTier = 2;
+            if (player.level >= 30) cycTier = 3;
+
+            const cycVariants = [
+                { name: "Pedalata Leggera (Abitudine)", base: 10, inc: 0.5 },
+                { name: "Pedalata Lipolitica (Bruciagrassi)", base: 15, inc: 0.5 },
+                { name: "Interval Training (1m Veloce/1m Lento)", base: 20, inc: 0 },
+                { name: "HIIT Zen (Scatti vigorosi)", base: 25, inc: 0 }
+            ];
+
+            let target = Math.floor(cycVariants[cycTier].base + (player.level * cycVariants[cycTier].inc));
+            if (target > 45) target = 45; // Hard cap a 45 min per sicurezza
+
+            dailyProgress.cyclette = {
+                name: cycVariants[cycTier].name,
+                target: target,
+                current: 0,
+                unit: "min",
+                done: false
+            };
+        }
+
         function generateDailyQuest() {
             dailyProgress.exercises = {};
             for (let type in EXERCISE_TIERS) {
                 const variant = getBestExerciseTier(type);
-                // Math.floor(base + (level * increment))
                 let quantity = Math.floor(variant.base + ((player.level - 1) * variant.inc)); 
                 dailyProgress.exercises[type] = {
                     name: variant.name, target: quantity, current: 0,
@@ -504,6 +559,8 @@
             } else {
                 dailyProgress.bonusQuest = null;
             }
+            
+            generateCycletteQuest();
         }
 
         // --- PENALTY (RE-ALIGNMENT) ---
@@ -559,12 +616,22 @@
             } else {
                 document.getElementById('penalty-overlay').classList.add('hidden');
                 
+                // Bonus Quest
                 const bonusPanel = document.getElementById('bonus-quest-panel');
                 if (dailyProgress.bonusQuest && !dailyProgress.bonusQuest.done && !dailyProgress.completed) {
                     bonusPanel.classList.remove('hidden');
                     document.getElementById('bonus-quest-desc').innerText = dailyProgress.bonusQuest.text;
                 } else {
                     bonusPanel.classList.add('hidden');
+                }
+
+                // Cyclette Panel (Cardio)
+                const cardioPanel = document.getElementById('cardio-panel');
+                if (dailyProgress.cyclette && !dailyProgress.completed) {
+                    cardioPanel.classList.remove('hidden');
+                    renderCyclette();
+                } else {
+                    cardioPanel.classList.add('hidden');
                 }
 
                 if (dailyProgress.completed) {
@@ -578,6 +645,53 @@
                     renderQuestList();
                 }
             }
+        }
+
+        function renderCyclette() {
+            const container = document.getElementById('cardio-content');
+            const data = dailyProgress.cyclette;
+            if(data.done) {
+                container.innerHTML = `<div class="text-center font-bold" style="color: var(--zen-fire)"><i class="fas fa-check-circle"></i> Allenamento Cardio Completato (+ XP)</div>`;
+                return;
+            }
+
+            const percent = Math.min(100, (data.current / data.target) * 100);
+            container.innerHTML = `
+                <div class="flex justify-between items-center mb-3 relative z-10">
+                    <div class="flex items-center gap-3">
+                        <i class="fas fa-bicycle w-6 text-center text-xl" style="color: var(--zen-fire)"></i>
+                        <div>
+                            <span class="font-bold text-gray-800 block text-md">${data.name}</span>
+                        </div>
+                    </div>
+                    <span class="font-mono text-lg font-bold text-gray-700 ml-2 whitespace-nowrap">${data.current} / ${data.target} <span class="text-xs font-sans text-gray-500 font-normal">${data.unit}</span></span>
+                </div>
+                <div class="h-1 progress-bg w-full mb-3">
+                    <div class="h-full progress-fire transition-all duration-300" style="width: ${percent}%;"></div>
+                </div>
+                <div class="flex gap-2 justify-end">
+                    <button onclick="updateCyclette(5)" class="px-3 py-1 border border-gray-300 rounded text-gray-600 hover:bg-white">+5m</button>
+                    <button onclick="updateCyclette(10)" class="px-3 py-1 border border-gray-300 rounded text-gray-600 hover:bg-white">+10m</button>
+                    <button onclick="updateCyclette(${data.target})" class="px-4 py-1 text-white rounded hover:opacity-90 ml-2" style="background-color: var(--zen-fire);"><i class="fas fa-check"></i></button>
+                </div>
+            `;
+        }
+
+        function updateCyclette(amount) {
+            const data = dailyProgress.cyclette;
+            if (amount === data.target) data.current = data.target;
+            else data.current += amount;
+            
+            if (data.current >= data.target) {
+                data.current = data.target;
+                data.done = true;
+                // Grant XP immediately for cardio
+                const cardioXp = Math.floor(15 + (player.level * 3));
+                player.xp += cardioXp;
+                showToast(`Fuoco acceso! Cyclette terminata. +${cardioXp} XP`, "var(--zen-fire)");
+            }
+            saveData();
+            renderUI();
         }
 
         function renderQuestList() {
