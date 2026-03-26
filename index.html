@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZEN SYSTEM - Hatha Flow</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --zen-green: #7b9e87; /* Salvia scuro */
+            --zen-light-green: #a3c4b0; /* Salvia chiaro */
+            --zen-bg: #fdfaf6; /* Bianco panna caldo */
+            --zen-panel: #ffffff;
+            --zen-text: #4a4a4a;
+            --zen-accent: #d4a373; /* Terra/Beige */
+            --zen-alert: #e07a5f; /* Terracotta morbido */
+            --zen-lavender: #d6cadd; /* Per la zona di riallineamento */
+        }
+
+        body {
+            background-color: var(--zen-bg);
+            color: var(--zen-text);
+            font-family: 'Nunito', sans-serif;
+            overflow-x: hidden;
+        }
+
+        .system-panel {
+            background: var(--zen-panel);
+            border: 1px solid #efebe4;
+            box-shadow: 0 8px 20px rgba(123, 158, 135, 0.08);
+            border-radius: 16px;
+        }
+
+        .system-header {
+            border-bottom: 2px solid var(--zen-light-green);
+            padding-bottom: 0.5rem;
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+            color: var(--zen-green);
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .glow-text {
+            color: var(--zen-green);
+            font-weight: 800;
+        }
+
+        .btn-system {
+            background: transparent;
+            border: 2px solid var(--zen-green);
+            color: var(--zen-green);
+            text-transform: uppercase;
+            font-weight: bold;
+            border-radius: 30px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .btn-system:hover:not(:disabled) {
+            background: var(--zen-green);
+            color: #fff;
+            box-shadow: 0 4px 10px rgba(123, 158, 135, 0.3);
+        }
+
+        .btn-system:disabled {
+            border-color: #ccc;
+            color: #ccc;
+            cursor: not-allowed;
+        }
+
+        /* Quest Nascosta */
+        .hidden-quest-panel {
+            border: 1px solid var(--zen-accent);
+            background: #fffbfa;
+        }
+        .hidden-quest-header {
+            color: var(--zen-accent);
+            border-bottom-color: var(--zen-accent);
+        }
+
+        /* Modalità Riallineamento (Ex Penalità) */
+        .penalty-mode {
+            background: #fff !important;
+            border: 2px solid var(--zen-lavender) !important;
+            box-shadow: 0 0 30px rgba(214, 202, 221, 0.5) !important;
+        }
+        .penalty-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(253, 250, 246, 0.95);
+            z-index: 50;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        .modal-overlay {
+            background: rgba(253, 250, 246, 0.85);
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 60;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+            backdrop-filter: blur(4px);
+        }
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+        .system-alert {
+            background: #fff;
+            border-radius: 16px;
+            max-width: 90%;
+            width: 400px;
+            padding: 2rem;
+            text-align: center;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.05);
+        }
+
+        .progress-fill {
+            background: var(--zen-light-green);
+            border-radius: 4px;
+        }
+
+        #toast-container { position: fixed; top: 20px; right: 20px; z-index: 100; }
+        .toast {
+            background: #fff;
+            border-left: 4px solid var(--zen-green);
+            color: var(--zen-text);
+            padding: 1rem;
+            margin-bottom: 0.5rem;
+            border-radius: 4px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            animation: slideIn 0.3s ease forwards;
+        }
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .hidden { display: none !important; }
+        .stat-desc { font-size: 0.75rem; color: #888; display: block; margin-top: 2px; }
+        
+        /* Custom UI Toggles */
+        .progress-bg { background: #f0f0f0; border-radius: 4px; }
+    </style>
+</head>
+<body class="p-4 md:p-8 min-h-screen flex flex-col items-center">
+
+    <div id="toast-container"></div>
+
+    <div class="w-full max-w-2xl flex justify-between items-center mb-4 text-sm text-gray-500">
+        <div>
+            <button onclick="toggleSettings()" class="hover:text-green-700 px-2 py-1"><i class="fas fa-leaf"></i> Profilo Hatha</button>
+        </div>
+    </div>
+
+    <div id="settings-panel" class="w-full max-w-2xl system-panel p-4 mb-4 hidden">
+        <h2 class="text-lg text-green-700 border-b border-gray-200 mb-4 pb-2">Gestione Dati Pratica</h2>
+        <div class="flex flex-col gap-4">
+            <button onclick="exportData()" class="btn-system py-2 text-sm"><i class="fas fa-download"></i> Esporta Backup</button>
+            <div class="relative">
+                <input type="file" id="import-file" accept=".json" class="hidden" onchange="importData(event)">
+                <button onclick="document.getElementById('import-file').click()" class="btn-system py-2 text-sm w-full" style="border-color: var(--zen-accent); color: var(--zen-accent);"><i class="fas fa-upload"></i> Importa Backup</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="main-container" class="w-full max-w-2xl transition-all duration-500">
+        
+        <div class="system-panel p-6 mb-6 relative">
+            <h1 class="text-2xl font-bold tracking-wider text-center text-green-700 mb-4">IL TUO LOTO</h1>
+            
+            <div class="grid grid-cols-2 gap-4 mb-6">
+                <div>
+                    <div class="text-gray-400 text-xs uppercase tracking-wider">Praticante</div>
+                    <div class="text-xl font-bold text-gray-700" id="player-name">Yogin</div>
+                </div>
+                <div class="text-right">
+                    <div class="text-gray-400 text-xs uppercase tracking-wider">Fioritura</div>
+                    <div class="text-sm font-bold" style="color: var(--zen-accent);" id="player-title">Seme (Livello Base)</div>
+                </div>
+            </div>
+
+            <div class="flex items-end gap-2 mb-2">
+                <span class="text-4xl font-bold text-gray-700">LV. <span id="level-display" class="glow-text">1</span></span>
+            </div>
+
+            <div class="w-full progress-bg h-3 mb-6 relative overflow-hidden">
+                <div id="xp-bar" class="progress-fill h-full transition-all duration-700" style="width: 0%"></div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4 text-sm">
+                <div class="stat-row">
+                    <div>
+                        <span class="text-gray-700 font-bold block">STABILITÀ (STB)</span>
+                        <span class="stat-desc">Equilibrio e radicamento (Gambe)</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span id="stb-val" class="font-bold text-lg" style="color: var(--zen-green)">1</span>
+                        <button onclick="addStat('stb')" class="stat-btn hidden text-green-500 hover:text-green-700 text-xl"><i class="fas fa-plus-circle"></i></button>
+                    </div>
+                </div>
+                <div class="stat-row">
+                    <div>
+                        <span class="text-gray-700 font-bold block">FLESSIBILITÀ (FLX)</span>
+                        <span class="stat-desc">Apertura anche e distensione</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span id="flx-val" class="font-bold text-lg" style="color: var(--zen-green)">1</span>
+                        <button onclick="addStat('flx')" class="stat-btn hidden text-green-500 hover:text-green-700 text-xl"><i class="fas fa-plus-circle"></i></button>
+                    </div>
+                </div>
+                <div class="stat-row">
+                    <div>
+                        <span class="text-gray-700 font-bold block">PRANA (PRA)</span>
+                        <span class="stat-desc">Mobilità della colonna e respiro</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span id="pra-val" class="font-bold text-lg" style="color: var(--zen-green)">1</span>
+                        <button onclick="addStat('pra')" class="stat-btn hidden text-green-500 hover:text-green-700 text-xl"><i class="fas fa-plus-circle"></i></button>
+                    </div>
+                </div>
+                <div class="stat-row">
+                    <div>
+                        <span class="text-gray-700 font-bold block">CONSAPEVOLEZZA (CNS)</span>
+                        <span class="stat-desc">Rilassamento e propriocezione</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span id="cns-val" class="font-bold text-lg" style="color: var(--zen-green)">1</span>
+                        <button onclick="addStat('cns')" class="stat-btn hidden text-green-500 hover:text-green-700 text-xl"><i class="fas fa-plus-circle"></i></button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="stat-points-container" class="mt-4 text-center hidden">
+                <span class="text-green-700 font-bold bg-green-50 px-4 py-2 rounded-full border border-green-200 inline-block">
+                    Punti Crescita disponibili: <span id="stat-points">0</span>
+                </span>
+            </div>
+        </div>
+
+        <div id="bonus-quest-panel" class="system-panel p-4 mb-6 hidden-quest-panel hidden">
+            <div class="system-header hidden-quest-header flex justify-between items-center text-sm border-none mb-0 pb-2">
+                <span><i class="fas fa-leaf"></i> INTENZIONE DEL GIORNO</span>
+                <span class="text-xs bg-orange-100 px-2 py-1 rounded text-orange-800">Cura di sé</span>
+            </div>
+            <p id="bonus-quest-desc" class="text-md text-gray-700 mb-4 text-center italic">"Bevi una tisana calda senza guardare schermi."</p>
+            <div class="flex justify-center">
+                <button onclick="completeBonusQuest()" class="px-6 py-2 border-2 border-orange-300 text-orange-600 hover:bg-orange-50 rounded-full font-bold transition-colors">
+                    <i class="fas fa-heart"></i> FATTO
+                </button>
+            </div>
+        </div>
+
+        <div id="quest-panel" class="system-panel p-6">
+            <div class="system-header flex justify-between items-center">
+                <span>PRATICA QUOTIDIANA</span>
+            </div>
+
+            <div class="space-y-4" id="quest-list">
+                </div>
+
+            <div id="quest-status-area" class="mt-8 text-center">
+                <button id="complete-quest-btn" onclick="finishDailyQuest()" class="btn-system w-full py-4 text-lg tracking-widest" disabled>
+                    CONCLUDI PRATICA
+                </button>
+                <div class="text-xs text-gray-500 mt-3">L'obiettivo non è lo sforzo, ma l'ascolto del corpo.</div>
+            </div>
+            
+            <div id="quest-completed-msg" class="hidden text-center py-8">
+                <i class="fas fa-spa text-4xl text-green-400 mb-4"></i>
+                <h3 class="text-2xl text-green-700 font-bold mb-2">PRATICA COMPLETATA</h3>
+                <p class="text-gray-500">Namasté. Il tuo corpo ti ringrazia.</p>
+                <div class="mt-6 text-sm text-gray-400 bg-gray-50 py-2 rounded-lg inline-block px-4" id="countdown"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="penalty-overlay" class="hidden penalty-overlay">
+        <div class="system-panel p-8 max-w-lg w-full text-center penalty-mode">
+            <i class="fas fa-wind text-5xl text-purple-300 mb-4"></i>
+            <h1 class="text-3xl font-bold text-gray-700 mb-2">RIALLINEAMENTO</h1>
+            <p class="text-gray-500 mb-6">Hai saltato la pratica di ieri. Nessun giudizio. Riprendiamo contatto con il corpo.</p>
+            
+            <div class="bg-purple-50 rounded-xl p-6 border border-purple-100 mb-6">
+                <h3 class="text-xl font-bold text-purple-800 mb-2">Posizione del Fanciullo (Balasana)</h3>
+                <p class="text-sm text-gray-600 mb-4">Siediti sui talloni, fronte a terra, braccia lungo i fianchi (rilassa le spalle). Respira.</p>
+                <div class="text-5xl font-mono text-purple-600 my-2" id="penalty-timer">02:00</div>
+            </div>
+            
+            <button onclick="startPenaltyTimer()" id="start-penalty-btn" class="btn-system w-full py-3 border-purple-300 text-purple-700 hover:bg-purple-50">
+                INIZIA A RESPIRARE
+            </button>
+        </div>
+    </div>
+
+    <div id="reward-modal" class="modal-overlay">
+        <div class="system-alert transform scale-95 transition-transform duration-200">
+            <h2 class="text-2xl font-bold text-green-700 mb-4">EQUILIBRIO RAGGIUNTO</h2>
+            <div class="space-y-3 text-left mb-6 mt-4">
+                <div class="flex justify-between border-b border-gray-100 py-2">
+                    <span class="text-gray-600">Pace Mentale</span>
+                    <span class="text-green-500 font-bold">Ristabilita</span>
+                </div>
+                <div class="flex justify-between border-b border-gray-100 py-2">
+                    <span class="text-gray-600">Punti Crescita</span>
+                    <span style="color: var(--zen-accent)" class="font-bold">+3</span>
+                </div>
+                <div class="flex justify-between py-2">
+                    <span class="text-gray-600">Esperienza Acquisita</span>
+                    <span class="text-green-600 font-bold" id="xp-gain-display">+100</span>
+                </div>
+            </div>
+            <button onclick="closeModal()" class="btn-system px-8 py-3 w-full">TORNA AL PRESENTE</button>
+        </div>
+    </div>
+
+    <script>
+        // --- HATHA YOGA EXERCISE DB (Shoulder Safe) ---
+        // Progressions are slow, focusing on breath and seconds.
+        const EXERCISE_TIERS = {
+            stabilita: [
+                { name: "Posizione della Montagna (Tadasana)", reqStat: "stb", reqVal: 0, base: 5, inc: 1, unit: "respiri" },
+                { name: "L'Albero (Vrksasana)", reqStat: "stb", reqVal: 10, base: 30, inc: 5, unit: "sec x gamba" },
+                { name: "Guerriero II (Mani ai fianchi)", reqStat: "stb", reqVal: 25, base: 20, inc: 5, unit: "sec x lato" },
+                { name: "Guerriero III (Mani al petto)", reqStat: "stb", reqVal: 50, base: 15, inc: 5, unit: "sec x gamba" }
+            ],
+            flessibilita: [
+                { name: "Piegamento in avanti (Ginocchia piegate)", reqStat: "flx", reqVal: 0, base: 30, inc: 5, unit: "sec" },
+                { name: "Posizione della Farfalla (Da seduti)", reqStat: "flx", reqVal: 10, base: 45, inc: 5, unit: "sec" },
+                { name: "Affondo Basso (Ginocchio a terra)", reqStat: "flx", reqVal: 25, base: 20, inc: 5, unit: "sec x lato" },
+                { name: "Pinza Seduta (Paschimottanasana)", reqStat: "flx", reqVal: 50, base: 40, inc: 5, unit: "sec" }
+            ],
+            prana: [ 
+                { name: "Respirazione Addominale", reqStat: "pra", reqVal: 0, base: 10, inc: 1, unit: "cicli" },
+                { name: "Gatto-Mucca (Dolce)", reqStat: "pra", reqVal: 10, base: 8, inc: 1, unit: "movimenti" },
+                { name: "Torsione a terra (Supina)", reqStat: "pra", reqVal: 25, base: 30, inc: 5, unit: "sec x lato" },
+                { name: "Respiro Narici Alternate", reqStat: "pra", reqVal: 50, base: 3, inc: 0.5, unit: "min" }
+            ],
+            consapevolezza: [
+                { name: "Ascolto del corpo (Seduti)", reqStat: "cns", reqVal: 0, base: 1, inc: 0.2, unit: "min" },
+                { name: "Savasana (Rilassamento finale)", reqStat: "cns", reqVal: 10, base: 3, inc: 0.5, unit: "min" },
+                { name: "Meditazione su un'emozione", reqStat: "cns", reqVal: 25, base: 5, inc: 0.5, unit: "min" }
+            ]
+        };
+
+        const BONUS_MISSIONS = [
+            "Bevi una tisana calda senza distrazioni digitali.",
+            "Fai una passeggiata di 10 minuti guardando la natura o il cielo.",
+            "Scrivi una cosa per cui sei grato oggi.",
+            "Massaggiati la base del collo e le spalle per 2 minuti.",
+            "Ascolta il rumore dell'ambiente intorno a te per 1 minuto ad occhi chiusi."
+        ];
+
+        const ICONS = {
+            stabilita: "fa-mountain", flessibilita: "fa-seedling", 
+            prana: "fa-wind", consapevolezza: "fa-om"
+        };
+        
+        // --- STATE ---
+        // COMPLETELY SEPARATE LOCALSTORAGE KEYS FROM SOLO LEVELING
+        const STORAGE_PLAYER = 'zen_v1_player';
+        const STORAGE_DAILY = 'zen_v1_daily';
+
+        let player = {
+            name: "Yogin", level: 1, xp: 0, xpToNext: 100,
+            stats: { stb: 1, flx: 1, pra: 1, cns: 1 },
+            statPoints: 0, penaltyActive: false
+        };
+
+        let dailyProgress = {
+            date: null, completed: false,
+            exercises: {}, bonusQuest: null
+        };
+
+        function showToast(message) {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.innerHTML = `<i class="fas fa-leaf mr-2" style="color: var(--zen-green)"></i> ${message}`;
+            container.appendChild(toast);
+            setTimeout(() => { toast.remove(); }, 3000);
+        }
+
+        function init() {
+            loadData();
+            checkDateLogic();
+            renderUI();
+            startCountdownClock();
+        }
+
+        function toggleSettings() {
+            document.getElementById('settings-panel').classList.toggle('hidden');
+        }
+
+        function loadData() {
+            const savedPlayer = localStorage.getItem(STORAGE_PLAYER);
+            const savedDaily = localStorage.getItem(STORAGE_DAILY);
+            if (savedPlayer) player = JSON.parse(savedPlayer);
+            if (savedDaily) dailyProgress = JSON.parse(savedDaily);
+        }
+
+        function saveData() {
+            localStorage.setItem(STORAGE_PLAYER, JSON.stringify(player));
+            localStorage.setItem(STORAGE_DAILY, JSON.stringify(dailyProgress));
+        }
+
+        function exportData() {
+            const data = { player, dailyProgress };
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(data));
+            const downloadAnchorNode = document.createElement('a');
+            downloadAnchorNode.setAttribute("href", dataStr);
+            downloadAnchorNode.setAttribute("download", "zen_system_backup.json");
+            document.body.appendChild(downloadAnchorNode);
+            downloadAnchorNode.click();
+            downloadAnchorNode.remove();
+            showToast("Backup scaricato.");
+        }
+
+        function importData(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    if (data.player && data.player.level) {
+                        player = data.player;
+                        if(data.dailyProgress) dailyProgress = data.dailyProgress;
+                        saveData();
+                        showToast("Dati sincronizzati.");
+                        setTimeout(() => location.reload(), 1500);
+                    } else showToast("File non valido.");
+                } catch (err) { showToast("Errore di lettura."); }
+            };
+            reader.readAsText(file);
+        }
+
+        function checkDateLogic() {
+            const today = new Date().toDateString();
+            if (!dailyProgress.date) {
+                dailyProgress.date = today;
+                generateDailyQuest();
+                return;
+            }
+            if (dailyProgress.date !== today) {
+                if (!dailyProgress.completed && !player.penaltyActive) {
+                    player.penaltyActive = true;
+                }
+                dailyProgress.date = today;
+                dailyProgress.completed = false;
+                generateDailyQuest();
+                saveData();
+            }
+        }
+
+        function getBestExerciseTier(type) {
+            const variants = EXERCISE_TIERS[type];
+            for (let i = variants.length - 1; i >= 0; i--) {
+                if (player.stats[variants[i].reqStat] >= variants[i].reqVal) return variants[i];
+            }
+            return variants[0];
+        }
+
+        function generateDailyQuest() {
+            dailyProgress.exercises = {};
+            for (let type in EXERCISE_TIERS) {
+                const variant = getBestExerciseTier(type);
+                // Math.floor(base + (level * increment))
+                let quantity = Math.floor(variant.base + ((player.level - 1) * variant.inc)); 
+                dailyProgress.exercises[type] = {
+                    name: variant.name, target: quantity, current: 0,
+                    unit: variant.unit || "unità", done: false
+                };
+            }
+            if (Math.random() < 0.40) { // 40% chance for a mindfulness quest
+                const randomQuest = BONUS_MISSIONS[Math.floor(Math.random() * BONUS_MISSIONS.length)];
+                dailyProgress.bonusQuest = { text: randomQuest, done: false };
+            } else {
+                dailyProgress.bonusQuest = null;
+            }
+        }
+
+        // --- PENALTY (RE-ALIGNMENT) ---
+        let penaltySeconds = 120; // 2 minuti di Balasana
+        function startPenaltyTimer() {
+            document.getElementById('start-penalty-btn').disabled = true;
+            const timerEl = document.getElementById('penalty-timer');
+            const interval = setInterval(() => {
+                penaltySeconds--;
+                const m = Math.floor(penaltySeconds/60).toString().padStart(2,'0');
+                const s = (penaltySeconds%60).toString().padStart(2,'0');
+                timerEl.innerText = `${m}:${s}`;
+                if(penaltySeconds<=0) {
+                    clearInterval(interval);
+                    showToast("Riallineamento completato. Bentornato.");
+                    player.penaltyActive = false;
+                    saveData();
+                    setTimeout(() => location.reload(), 1500);
+                }
+            }, 1000);
+        }
+
+        // --- UI RENDERING ---
+        function renderUI() {
+            document.getElementById('level-display').innerText = player.level;
+            document.getElementById('stb-val').innerText = player.stats.stb;
+            document.getElementById('flx-val').innerText = player.stats.flx;
+            document.getElementById('pra-val').innerText = player.stats.pra;
+            document.getElementById('cns-val').innerText = player.stats.cns;
+            
+            const xpPercent = Math.min(100, (player.xp / player.xpToNext) * 100);
+            document.getElementById('xp-bar').style.width = `${xpPercent}%`;
+
+            const titleEl = document.getElementById('player-title');
+            if (player.level < 10) titleEl.innerText = "Seme (Novizio)";
+            else if (player.level < 25) titleEl.innerText = "Radice (Praticante)";
+            else if (player.level < 45) titleEl.innerText = "Fusto (Yogin)";
+            else titleEl.innerText = "Fioritura (Maestro)";
+
+            const ptsContainer = document.getElementById('stat-points-container');
+            const statBtns = document.querySelectorAll('.stat-btn');
+            if (player.statPoints > 0) {
+                ptsContainer.classList.remove('hidden');
+                document.getElementById('stat-points').innerText = player.statPoints;
+                statBtns.forEach(btn => btn.classList.remove('hidden'));
+            } else {
+                ptsContainer.classList.add('hidden');
+                statBtns.forEach(btn => btn.classList.add('hidden'));
+            }
+
+            if (player.penaltyActive) {
+                document.getElementById('penalty-overlay').classList.remove('hidden');
+            } else {
+                document.getElementById('penalty-overlay').classList.add('hidden');
+                
+                const bonusPanel = document.getElementById('bonus-quest-panel');
+                if (dailyProgress.bonusQuest && !dailyProgress.bonusQuest.done && !dailyProgress.completed) {
+                    bonusPanel.classList.remove('hidden');
+                    document.getElementById('bonus-quest-desc').innerText = dailyProgress.bonusQuest.text;
+                } else {
+                    bonusPanel.classList.add('hidden');
+                }
+
+                if (dailyProgress.completed) {
+                    document.getElementById('quest-list').classList.add('hidden');
+                    document.getElementById('quest-status-area').classList.add('hidden');
+                    document.getElementById('quest-completed-msg').classList.remove('hidden');
+                } else {
+                    document.getElementById('quest-list').classList.remove('hidden');
+                    document.getElementById('quest-status-area').classList.remove('hidden');
+                    document.getElementById('quest-completed-msg').classList.add('hidden');
+                    renderQuestList();
+                }
+            }
+        }
+
+        function renderQuestList() {
+            const list = document.getElementById('quest-list');
+            list.innerHTML = '';
+            let allDone = true;
+
+            for (let key in dailyProgress.exercises) {
+                const data = dailyProgress.exercises[key];
+                if (!data.done) allDone = false;
+                const percent = Math.min(100, (data.current / data.target) * 100);
+                const iconClass = ICONS[key];
+                
+                const item = document.createElement('div');
+                item.className = "bg-white p-4 border border-gray-100 rounded-xl shadow-sm mb-3 relative overflow-hidden";
+                item.innerHTML = `
+                    <div class="flex justify-between items-center mb-3 relative z-10">
+                        <div class="flex items-center gap-3">
+                            <i class="fas ${iconClass} w-6 text-center text-xl" style="color: var(--zen-green)"></i>
+                            <div>
+                                <span class="font-bold text-gray-700 block text-md">${data.name}</span>
+                            </div>
+                        </div>
+                        <span class="font-mono text-lg font-bold text-gray-600 ml-2 whitespace-nowrap">${data.current} / ${data.target} <span class="text-xs font-sans text-gray-400 font-normal">${data.unit}</span></span>
+                    </div>
+                    <div class="absolute bottom-0 left-0 h-1 bg-gray-100 w-full z-0">
+                        <div class="h-full transition-all duration-300" style="width: ${percent}%; background-color: var(--zen-green)"></div>
+                    </div>
+                    <div class="flex gap-2 mt-2 relative z-10 justify-end">
+                        <button onclick="updateExercise('${key}', -1)" class="px-3 py-1 border border-gray-300 rounded text-gray-500 hover:bg-gray-50">-</button>
+                        <button onclick="updateExercise('${key}', 1)" class="px-3 py-1 border border-gray-300 rounded text-gray-500 hover:bg-gray-50">+1</button>
+                        <button onclick="updateExercise('${key}', 5)" class="px-3 py-1 border border-gray-300 rounded text-gray-500 hover:bg-gray-50">+5</button>
+                        <button onclick="updateExercise('${key}', ${data.target})" class="px-4 py-1 border text-white rounded hover:opacity-90 ml-2" style="background-color: var(--zen-green); border-color: var(--zen-green);"><i class="fas fa-check"></i></button>
+                    </div>
+                `;
+                list.appendChild(item);
+            }
+
+            const completeBtn = document.getElementById('complete-quest-btn');
+            completeBtn.disabled = !allDone;
+            if (allDone) {
+                completeBtn.style.backgroundColor = "var(--zen-green)";
+                completeBtn.style.color = "#fff";
+                completeBtn.classList.add('shadow-lg');
+            } else {
+                completeBtn.style.backgroundColor = "transparent";
+                completeBtn.style.color = "var(--zen-green)";
+                completeBtn.classList.remove('shadow-lg');
+            }
+        }
+
+        function updateExercise(key, amount) {
+            const data = dailyProgress.exercises[key];
+            if (amount === data.target) data.current = data.target;
+            else data.current += amount;
+            
+            if (data.current < 0) data.current = 0;
+            if (data.current >= data.target) {
+                data.current = data.target;
+                data.done = true;
+            } else data.done = false;
+            
+            saveData();
+            renderUI();
+        }
+
+        function completeBonusQuest() {
+            if(dailyProgress.bonusQuest) {
+                dailyProgress.bonusQuest.done = true;
+                const bonusXp = Math.floor(10 + (player.level * 2));
+                player.xp += bonusXp;
+                showToast(`Intenzione compiuta. +${bonusXp} Esperienza`);
+                saveData();
+                renderUI();
+            }
+        }
+
+        function finishDailyQuest() {
+            dailyProgress.completed = true;
+            
+            let xpGain = Math.floor(25 + (player.level * 5)); 
+
+            player.xp += xpGain;
+            player.statPoints += 3;
+            
+            if (player.xp >= player.xpToNext) {
+                player.level++;
+                player.xp -= player.xpToNext;
+                player.xpToNext = Math.floor(player.xpToNext * 1.20);
+                player.stats.stb++; player.stats.flx++;
+                player.stats.pra++; player.stats.cns++;
+            }
+
+            saveData();
+            renderUI();
+            
+            document.getElementById('xp-gain-display').innerText = `+${xpGain}`;
+            document.getElementById('reward-modal').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('reward-modal').classList.remove('active');
+            location.reload(); 
+        }
+
+        function addStat(stat) {
+            if (player.statPoints > 0) {
+                player.stats[stat]++;
+                player.statPoints--;
+                saveData();
+                renderUI();
+            }
+        }
+
+        function startCountdownClock() {
+            setInterval(() => {
+                const now = new Date();
+                const tomorrow = new Date(now);
+                tomorrow.setDate(tomorrow.getDate() + 1);
+                tomorrow.setHours(0, 0, 0, 0);
+                const diff = tomorrow - now;
+                const h = Math.floor(diff/(1000*60*60));
+                const m = Math.floor((diff%(1000*60*60))/(1000*60));
+                const el = document.getElementById('countdown');
+                if(el) el.innerText = `Prossima fioritura tra: ${h}h ${m}m`;
+            }, 60000);
+        }
+
+        init();
+    </script>
+</body>
+</html>
