@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ZEN SYSTEM - Hatha Flow</title>
+    <title>ZEN SYSTEM - Hatha Flow 1.1</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
@@ -89,7 +89,7 @@
             border-bottom-color: var(--zen-accent);
         }
 
-        /* Modalità Riallineamento (Ex Penalità) */
+        /* Modalità Riallineamento */
         .penalty-mode {
             background: #fff !important;
             border: 2px solid var(--zen-lavender) !important;
@@ -156,8 +156,6 @@
 
         .hidden { display: none !important; }
         .stat-desc { font-size: 0.75rem; color: #888; display: block; margin-top: 2px; }
-        
-        /* Custom UI Toggles */
         .progress-bg { background: #f0f0f0; border-radius: 4px; }
     </style>
 </head>
@@ -165,12 +163,14 @@
 
     <div id="toast-container"></div>
 
+    <!-- Top Navigation -->
     <div class="w-full max-w-2xl flex justify-between items-center mb-4 text-sm text-gray-500">
         <div>
-            <button onclick="toggleSettings()" class="hover:text-green-700 px-2 py-1"><i class="fas fa-leaf"></i> Profilo Hatha</button>
+            <button onclick="toggleSettings()" class="hover:text-green-700 px-2 py-1 transition-colors"><i class="fas fa-leaf"></i> Profilo Hatha</button>
         </div>
     </div>
 
+    <!-- Settings Panel -->
     <div id="settings-panel" class="w-full max-w-2xl system-panel p-4 mb-4 hidden">
         <h2 class="text-lg text-green-700 border-b border-gray-200 mb-4 pb-2">Gestione Dati Pratica</h2>
         <div class="flex flex-col gap-4">
@@ -184,6 +184,7 @@
 
     <div id="main-container" class="w-full max-w-2xl transition-all duration-500">
         
+        <!-- Status Panel -->
         <div class="system-panel p-6 mb-6 relative">
             <h1 class="text-2xl font-bold tracking-wider text-center text-green-700 mb-4">IL TUO LOTO</h1>
             
@@ -202,10 +203,12 @@
                 <span class="text-4xl font-bold text-gray-700">LV. <span id="level-display" class="glow-text">1</span></span>
             </div>
 
+            <!-- XP Bar -->
             <div class="w-full progress-bg h-3 mb-6 relative overflow-hidden">
                 <div id="xp-bar" class="progress-fill h-full transition-all duration-700" style="width: 0%"></div>
             </div>
 
+            <!-- Stats Grid -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4 text-sm">
                 <div class="stat-row">
                     <div>
@@ -256,6 +259,7 @@
             </div>
         </div>
 
+        <!-- Hidden Quest Section -->
         <div id="bonus-quest-panel" class="system-panel p-4 mb-6 hidden-quest-panel hidden">
             <div class="system-header hidden-quest-header flex justify-between items-center text-sm border-none mb-0 pb-2">
                 <span><i class="fas fa-leaf"></i> INTENZIONE DEL GIORNO</span>
@@ -269,13 +273,15 @@
             </div>
         </div>
 
+        <!-- Daily Practice Section -->
         <div id="quest-panel" class="system-panel p-6">
             <div class="system-header flex justify-between items-center">
                 <span>PRATICA QUOTIDIANA</span>
             </div>
 
             <div class="space-y-4" id="quest-list">
-                </div>
+                <!-- Populated by JS -->
+            </div>
 
             <div id="quest-status-area" class="mt-8 text-center">
                 <button id="complete-quest-btn" onclick="finishDailyQuest()" class="btn-system w-full py-4 text-lg tracking-widest" disabled>
@@ -293,6 +299,7 @@
         </div>
     </div>
 
+    <!-- Re-alignment Overlay -->
     <div id="penalty-overlay" class="hidden penalty-overlay">
         <div class="system-panel p-8 max-w-lg w-full text-center penalty-mode">
             <i class="fas fa-wind text-5xl text-purple-300 mb-4"></i>
@@ -311,6 +318,7 @@
         </div>
     </div>
 
+    <!-- Reward Modal -->
     <div id="reward-modal" class="modal-overlay">
         <div class="system-alert transform scale-95 transition-transform duration-200">
             <h2 class="text-2xl font-bold text-green-700 mb-4">EQUILIBRIO RAGGIUNTO</h2>
@@ -333,8 +341,7 @@
     </div>
 
     <script>
-        // --- HATHA YOGA EXERCISE DB (Shoulder Safe) ---
-        // Progressions are slow, focusing on breath and seconds.
+        // --- HATHA YOGA EXERCISE DB (Shoulder Safe - V1.1) ---
         const EXERCISE_TIERS = {
             stabilita: [
                 { name: "Posizione della Montagna (Tadasana)", reqStat: "stb", reqVal: 0, base: 5, inc: 1, unit: "respiri" },
@@ -344,15 +351,17 @@
             ],
             flessibilita: [
                 { name: "Piegamento in avanti (Ginocchia piegate)", reqStat: "flx", reqVal: 0, base: 30, inc: 5, unit: "sec" },
-                { name: "Posizione della Farfalla (Da seduti)", reqStat: "flx", reqVal: 10, base: 45, inc: 5, unit: "sec" },
-                { name: "Affondo Basso (Ginocchio a terra)", reqStat: "flx", reqVal: 25, base: 20, inc: 5, unit: "sec x lato" },
-                { name: "Pinza Seduta (Paschimottanasana)", reqStat: "flx", reqVal: 50, base: 40, inc: 5, unit: "sec" }
+                { name: "Mezza Luna (Flessione Laterale)", reqStat: "flx", reqVal: 10, base: 20, inc: 5, unit: "sec x lato" },
+                { name: "Posizione della Farfalla (Seduti)", reqStat: "flx", reqVal: 25, base: 45, inc: 5, unit: "sec" },
+                { name: "Affondo Basso (Ginocchio a terra)", reqStat: "flx", reqVal: 50, base: 20, inc: 5, unit: "sec x lato" },
+                { name: "Pinza Seduta (Paschimottanasana)", reqStat: "flx", reqVal: 80, base: 40, inc: 5, unit: "sec" }
             ],
             prana: [ 
                 { name: "Respirazione Addominale", reqStat: "pra", reqVal: 0, base: 10, inc: 1, unit: "cicli" },
-                { name: "Gatto-Mucca (Dolce)", reqStat: "pra", reqVal: 10, base: 8, inc: 1, unit: "movimenti" },
-                { name: "Torsione a terra (Supina)", reqStat: "pra", reqVal: 25, base: 30, inc: 5, unit: "sec x lato" },
-                { name: "Respiro Narici Alternate", reqStat: "pra", reqVal: 50, base: 3, inc: 0.5, unit: "min" }
+                { name: "Rotazioni Spalle e Collo (Senza sforzo)", reqStat: "pra", reqVal: 10, base: 1, inc: 0.2, unit: "min" },
+                { name: "Gatto-Mucca (Dolce)", reqStat: "pra", reqVal: 25, base: 8, inc: 1, unit: "movimenti" },
+                { name: "Torsione a terra (Supina)", reqStat: "pra", reqVal: 50, base: 30, inc: 5, unit: "sec x lato" },
+                { name: "Respiro Narici Alternate", reqStat: "pra", reqVal: 80, base: 3, inc: 0.5, unit: "min" }
             ],
             consapevolezza: [
                 { name: "Ascolto del corpo (Seduti)", reqStat: "cns", reqVal: 0, base: 1, inc: 0.2, unit: "min" },
@@ -375,7 +384,6 @@
         };
         
         // --- STATE ---
-        // COMPLETELY SEPARATE LOCALSTORAGE KEYS FROM SOLO LEVELING
         const STORAGE_PLAYER = 'zen_v1_player';
         const STORAGE_DAILY = 'zen_v1_daily';
 
@@ -490,7 +498,7 @@
                     unit: variant.unit || "unità", done: false
                 };
             }
-            if (Math.random() < 0.40) { // 40% chance for a mindfulness quest
+            if (Math.random() < 0.40) { 
                 const randomQuest = BONUS_MISSIONS[Math.floor(Math.random() * BONUS_MISSIONS.length)];
                 dailyProgress.bonusQuest = { text: randomQuest, done: false };
             } else {
