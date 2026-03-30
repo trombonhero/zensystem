@@ -3,21 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ZEN SYSTEM - Hatha Flow & Cardio</title>
+    <title>ZEN SYSTEM - Il Loto Infinito</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         :root {
-            --zen-green: #7b9e87; 
-            --zen-light-green: #a3c4b0; 
-            --zen-bg: #fdfaf6; 
+            --zen-green: #60806b; /* Salvia elegante */
+            --zen-light-green: #9eb5a5; 
+            --zen-bg: #faf7f2; /* Panna */
             --zen-panel: #ffffff;
             --zen-text: #4a4a4a;
-            --zen-accent: #d4a373; 
-            --zen-lavender: #d6cadd;
-            --zen-fire: #e07a5f; /* Terracotta/Fuoco per il cardio */
-            --zen-fire-light: #fbeae5;
+            --zen-accent: #c49667; /* Oro/Terra */
+            --zen-fire: #d46b53; /* Fuoco morbido */
+            --zen-lavender: #b5a4bf;
         }
 
         body {
@@ -29,8 +28,8 @@
 
         .system-panel {
             background: var(--zen-panel);
-            border: 1px solid #efebe4;
-            box-shadow: 0 8px 20px rgba(123, 158, 135, 0.08);
+            border: 1px solid #efeae0;
+            box-shadow: 0 12px 30px rgba(96, 128, 107, 0.08);
             border-radius: 16px;
         }
 
@@ -40,8 +39,8 @@
             margin-bottom: 1rem;
             text-transform: uppercase;
             color: var(--zen-green);
-            font-weight: 700;
-            letter-spacing: 1px;
+            font-weight: 800;
+            letter-spacing: 2px;
         }
 
         .stat-row {
@@ -49,7 +48,7 @@
             justify-content: space-between;
             align-items: center;
             padding: 0.75rem 0;
-            border-bottom: 1px solid #f0f0f0;
+            border-bottom: 1px solid #f5f5f5;
         }
 
         .glow-text {
@@ -71,22 +70,350 @@
         .btn-system:hover:not(:disabled) {
             background: var(--zen-green);
             color: #fff;
-            box-shadow: 0 4px 10px rgba(123, 158, 135, 0.3);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 15px rgba(96, 128, 107, 0.2);
         }
 
         .btn-system:disabled {
-            border-color: #ccc;
-            color: #ccc;
+            border-color: #d1d1d1;
+            color: #d1d1d1;
             cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
         }
 
-        /* Quest Nascosta */
+        /* Missione Intenzione */
         .hidden-quest-panel {
             border: 1px solid var(--zen-accent);
-            background: #fffbfa;
+            background: #fffdfa;
         }
         .hidden-quest-header {
             color: var(--zen-accent);
+            border-bottom-color: var(--zen-accent);
+        }
+
+        /* Cardio */
+        .cardio-panel {
+            border: 2px dashed var(--zen-fire);
+            background: #fffcfb;
+        }
+        .cardio-header {
+            color: var(--zen-fire);
+            border-bottom: none;
+        }
+
+        /* Riallineamento (Penalty) */
+        .penalty-mode {
+            background: #fff !important;
+            border: 2px solid var(--zen-lavender) !important;
+            box-shadow: 0 0 40px rgba(181, 164, 191, 0.4) !important;
+        }
+        .penalty-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(250, 247, 242, 0.95);
+            z-index: 50;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        .modal-overlay {
+            background: rgba(250, 247, 242, 0.9);
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 60;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+            backdrop-filter: blur(5px);
+        }
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+        .system-alert {
+            background: #fff;
+            border: 2px solid var(--zen-green);
+            border-radius: 20px;
+            max-width: 90%;
+            width: 420px;
+            padding: 2.5rem;
+            text-align: center;
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.1);
+        }
+
+        .progress-fill { background: var(--zen-green); border-radius: 6px; }
+        .progress-fire { background: var(--zen-fire); border-radius: 6px; }
+        .progress-bg { background: #e8e8e8; border-radius: 6px; }
+
+        #toast-container { position: fixed; top: 20px; right: 20px; z-index: 100; }
+        .toast {
+            background: #fff;
+            color: var(--zen-text);
+            padding: 1rem 1.5rem;
+            margin-bottom: 0.5rem;
+            border-radius: 8px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+            animation: slideIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+            font-weight: 600;
+        }
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        .hidden { display: none !important; }
+        .stat-desc { font-size: 0.75rem; color: #888; display: block; margin-top: 2px; }
+    </style>
+</head>
+<body class="p-4 md:p-8 min-h-screen flex flex-col items-center">
+
+    <!-- AUDIO -->
+    <audio id="sfx-level-up" src="https://assets.mixkit.co/active_storage/sfx/2000/2000-preview.mp3"></audio>
+    <audio id="sfx-click" src="https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3"></audio>
+    <audio id="sfx-crit" src="https://assets.mixkit.co/active_storage/sfx/1435/1435-preview.mp3"></audio>
+
+    <div id="toast-container"></div>
+
+    <div class="w-full max-w-2xl flex justify-between items-center mb-4 text-sm font-bold text-gray-400">
+        <div>
+            <button onclick="toggleSettings()" class="hover:text-gray-700 px-2 py-1 transition-colors"><i class="fas fa-leaf"></i> GESTIONE PRATICA</button>
+        </div>
+    </div>
+
+    <!-- Settings -->
+    <div id="settings-panel" class="w-full max-w-2xl system-panel p-5 mb-4 hidden">
+        <h2 class="text-lg text-gray-700 border-b border-gray-200 mb-4 pb-2 font-bold">Dati del Loto</h2>
+        <div class="flex flex-col gap-4">
+            <button onclick="exportData()" class="btn-system py-2 text-sm"><i class="fas fa-download"></i> Custodisci Backup</button>
+            <div class="relative">
+                <input type="file" id="import-file" accept=".json" class="hidden" onchange="importData(event)">
+                <button onclick="document.getElementById('import-file').click()" class="btn-system py-2 text-sm w-full" style="border-color: var(--zen-accent); color: var(--zen-accent);"><i class="fas fa-upload"></i> Ripristina Percorso</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="main-container" class="w-full max-w-2xl transition-all duration-500">
+        
+        <!-- Status -->
+        <div class="system-panel p-6 mb-6 relative">
+            <h1 class="text-2xl font-black tracking-widest text-center text-gray-700 mb-6">IL TUO LOTO</h1>
+            
+            <div class="grid grid-cols-2 gap-4 mb-6">
+                <div>
+                    <div class="text-gray-400 text-xs uppercase tracking-wider font-bold">PRATICANTE</div>
+                    <div class="text-2xl font-black text-gray-700" id="player-name">YOGIN</div>
+                </div>
+                <div class="text-right">
+                    <div class="text-gray-400 text-xs uppercase tracking-wider font-bold">FIORITURA</div>
+                    <div class="text-md font-black" style="color: var(--zen-accent);" id="player-title">Radice (Avanzato)</div>
+                </div>
+            </div>
+
+            <div class="flex items-end gap-2 mb-2">
+                <span class="text-5xl font-black text-gray-700">LV. <span id="level-display" class="glow-text">15</span></span>
+            </div>
+
+            <div class="w-full progress-bg h-3 mb-8 relative overflow-hidden">
+                <div id="xp-bar" class="progress-fill h-full transition-all duration-700" style="width: 0%"></div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-5 text-sm">
+                <div class="stat-row">
+                    <div>
+                        <span class="text-gray-700 font-bold block text-base">STABILITÀ (STB)</span>
+                        <span class="stat-desc">Forza del tronco ed equilibrio</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span id="stb-val" class="font-bold text-xl" style="color: var(--zen-green)">15</span>
+                        <button onclick="addStat('stb')" class="stat-btn hidden text-gray-400 hover:text-green-600 text-2xl transition-colors"><i class="fas fa-plus-circle"></i></button>
+                    </div>
+                </div>
+                <div class="stat-row">
+                    <div>
+                        <span class="text-gray-700 font-bold block text-base">FLESSIBILITÀ (FLX)</span>
+                        <span class="stat-desc">Apertura profonda e distensione</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span id="flx-val" class="font-bold text-xl" style="color: var(--zen-green)">15</span>
+                        <button onclick="addStat('flx')" class="stat-btn hidden text-gray-400 hover:text-green-600 text-2xl transition-colors"><i class="fas fa-plus-circle"></i></button>
+                    </div>
+                </div>
+                <div class="stat-row">
+                    <div>
+                        <span class="text-gray-700 font-bold block text-base">DINAMISMO (DIN)</span>
+                        <span class="stat-desc">Flusso vitale e calore (Agni)</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span id="din-val" class="font-bold text-xl" style="color: var(--zen-green)">15</span>
+                        <button onclick="addStat('din')" class="stat-btn hidden text-gray-400 hover:text-green-600 text-2xl transition-colors"><i class="fas fa-plus-circle"></i></button>
+                    </div>
+                </div>
+                <div class="stat-row">
+                    <div>
+                        <span class="text-gray-700 font-bold block text-base">CONSAPEVOLEZZA (CNS)</span>
+                        <span class="stat-desc">Focus mentale e presenza</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span id="cns-val" class="font-bold text-xl" style="color: var(--zen-green)">15</span>
+                        <button onclick="addStat('cns')" class="stat-btn hidden text-gray-400 hover:text-green-600 text-2xl transition-colors"><i class="fas fa-plus-circle"></i></button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="stat-points-container" class="mt-6 text-center hidden">
+                <span class="text-white font-bold px-6 py-2 rounded-full uppercase tracking-widest text-xs" style="background-color: var(--zen-green)">
+                    Punti Crescita: <span id="stat-points" class="font-black text-lg">0</span>
+                </span>
+            </div>
+        </div>
+
+        <!-- Bonus Intenzione -->
+        <div id="bonus-quest-panel" class="system-panel p-5 mb-5 hidden-quest-panel hidden">
+            <div class="system-header hidden-quest-header flex justify-between items-center text-sm border-none mb-0 pb-2">
+                <span><i class="fas fa-spa"></i> INTENZIONE DEL GIORNO</span>
+                <span class="text-xs px-2 py-1 rounded font-bold" style="background: rgba(196,150,103,0.1); color: var(--zen-accent)">CURA DI SÉ</span>
+            </div>
+            <p id="bonus-quest-desc" class="text-lg text-gray-700 mb-5 text-center italic mt-2">"Ascolta una canzone ad occhi chiusi, senza fare altro."</p>
+            <div class="flex justify-center">
+                <button onclick="completeBonusQuest()" class="px-8 py-2 border-2 rounded-full font-bold transition-all uppercase tracking-wider text-sm" style="border-color: var(--zen-accent); color: var(--zen-accent)">
+                    Compiuta
+                </button>
+            </div>
+        </div>
+
+        <!-- Cyclette -->
+        <div id="cardio-panel" class="system-panel cardio-panel p-5 mb-6">
+            <div class="system-header cardio-header flex justify-between items-center text-sm">
+                <span><i class="fas fa-fire"></i> IL FUOCO INTERIORE (CYCLETTE)</span>
+                <span class="text-xs px-2 py-1 rounded font-bold" style="background: rgba(212,107,83,0.1); color: var(--zen-fire)">FACOLTATIVO</span>
+            </div>
+            <div id="cardio-content" class="mt-3">
+                <!-- Populated by JS -->
+            </div>
+        </div>
+
+        <!-- Pratica -->
+        <div id="quest-panel" class="system-panel p-6">
+            <div class="system-header flex justify-between items-center">
+                <span>PRATICA QUOTIDIANA</span>
+            </div>
+
+            <div class="space-y-4" id="quest-list">
+                <!-- Populated by JS -->
+            </div>
+
+            <div id="quest-status-area" class="mt-8 text-center">
+                <button id="complete-quest-btn" onclick="finishDailyQuest()" class="btn-system w-full py-4 text-xl tracking-widest" disabled>
+                    CONCLUDI PRATICA
+                </button>
+                <div class="text-xs text-gray-400 mt-4 uppercase tracking-widest">Ascolta il respiro. Rispetta i tuoi limiti.</div>
+            </div>
+            
+            <div id="quest-completed-msg" class="hidden text-center py-10">
+                <i class="fas fa-om text-5xl mb-4" style="color: var(--zen-green)"></i>
+                <h3 class="text-3xl text-gray-700 font-black mb-2 uppercase tracking-widest">NAMASTÉ</h3>
+                <p class="text-gray-500 font-bold">La pratica odierna è fiorita. Riposa in pace.</p>
+                <div class="mt-6 text-sm text-gray-500 font-mono bg-gray-100 py-2 rounded-lg inline-block px-5 font-bold" id="countdown"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Riallineamento (Penalty) -->
+    <div id="penalty-overlay" class="hidden penalty-overlay">
+        <div class="system-panel p-10 max-w-lg w-full text-center penalty-mode">
+            <i class="fas fa-wind text-6xl mb-6" style="color: var(--zen-lavender)"></i>
+            <h1 class="text-4xl font-black text-gray-700 mb-3 uppercase tracking-widest">RIALLINEAMENTO</h1>
+            <p class="text-gray-600 font-bold mb-8">Hai perso il contatto con la pratica. Nessun giudizio. Ricentriamoci.</p>
+            
+            <div class="rounded-xl p-6 border-2 mb-8" style="background: #faf8fc; border-color: #e5dde9">
+                <h3 class="text-2xl font-black mb-3 uppercase" style="color: #6a577c">Malasana (Yogi Squat)</h3>
+                <p class="text-sm text-gray-600 mb-5 font-bold">Scendi in accosciata profonda. Talloni a terra o su un supporto. Gomiti contro le ginocchia, mani unite. Respira nel bacino.</p>
+                <div class="text-6xl font-black font-mono my-2" style="color: var(--zen-lavender)" id="penalty-timer">02:00</div>
+            </div>
+            
+            <button onclick="startPenaltyTimer()" id="start-penalty-btn" class="btn-system w-full py-4 text-xl font-black" style="border-color: var(--zen-lavender); color: var(--zen-lavender);">
+                INIZIA A RESPIRARE
+            </button>
+        </div>
+    </div>
+
+    <!-- Reward -->
+    <div id="reward-modal" class="modal-overlay">
+        <div class="system-alert transform scale-95 transition-transform duration-200">
+            <h2 class="text-3xl font-black text-gray-700 mb-6 uppercase tracking-widest">FIORITURA</h2>
+            <div class="space-y-4 text-left mb-8 mt-4 font-bold text-gray-600">
+                <div class="flex justify-between border-b border-gray-100 py-3">
+                    <span>Pace Mentale</span>
+                    <span style="color: var(--zen-green)">Ristabilita</span>
+                </div>
+                <div class="flex justify-between border-b border-gray-100 py-3">
+                    <span>Punti Crescita</span>
+                    <span style="color: var(--zen-accent)">+3</span>
+                </div>
+                <div class="flex justify-between py-3">
+                    <span>Esperienza (Prana)</span>
+                    <span class="text-xl" style="color: var(--zen-green)" id="xp-gain-display">+100</span>
+                </div>
+            </div>
+            <button onclick="closeModal()" class="btn-system px-8 py-4 w-full text-xl font-black">TORNA AL PRESENTE</button>
+        </div>
+    </div>
+
+    <script>
+        // --- AUDIO ---
+        const sfxClick = document.getElementById('sfx-click');
+        const sfxLevelUp = document.getElementById('sfx-level-up');
+        const sfxCrit = document.getElementById('sfx-crit');
+
+        function playSound(sound) {
+            sound.currentTime = 0;
+            sound.play().catch(e => {});
+        }
+
+        function showToast(message, color = "var(--zen-green)") {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.style.borderLeft = `6px solid ${color}`;
+            toast.innerHTML = `<i class="fas fa-leaf mr-3" style="color: ${color}"></i> ${message}`;
+            container.appendChild(toast);
+            setTimeout(() => { toast.remove(); }, 3500);
+        }
+
+        // --- INFINITE LIBRARY DB (Procedural Generation) ---
+        // Ogni Tier non ha più una sola asana, ma un array di asana (pool). Il sistema ne sceglie una a caso ogni giorno.
+        const EXERCISE_LIBRARY = {
+            stb: [ // Stabilità (Gambe e Radicamento)
+                { req: 0, pool: [
+                    { name: "L'Albero (Vrksasana)", base: 45, inc: 5, unit: "sec x gamba" },
+                    { name: "Guerriero II (Mani ai fianchi)", base: 30, inc: 5, unit: "sec x lato" },
+                    { name: "Sedia Profonda (Utkatasana)", base: 30, inc: 5, unit: "sec" }
+                ]},
+                { req: 15, pool: [
+                    { name: "Guerriero III (Equilibrio a T)", base: 30, inc: 5, unit: "sec x gamba" },
+                    { name: "Mezza Luna (Equilibrio su 1 mano/1 piede)", base: 30, inc: 5, unit: "sec x lato" },
+                    { name: "Aquila (Garudasana - Solo incrocio gambe)", base: 45, inc: 5, unit: "sec x lato" }
+                ]},
+                { req: 30, pool: [
+                    { name: "Shiva Squat (Gamba incrociata dietro)", base: 10, inc: 1, unit: "reps x lato" },
+                    { name: "Pistol Squat Assistiti", base: 8, inc: 1, unit: "reps x lato" },
+                    { name: "Danzatore (Natarajasana)", base: 45, inc: 5, unit: "sec x lato" }
+                ]}
+            ],
+            flx: [ // Flessibilità (Aperture anche e catena posteriore)
+                { req: 0, pool: [
+                    { name: "Piegamento in avanti (Ginocchia piegate)", base: 45, inc: 5, unit: "sec" },
+                    { name: "Farfalla Profonda (Baddha Konasana)", base: 60, inc: 10, unit: "sec" },
+                    { name: "Allungamento Laterale in piedi", base: 30, inc: 5, unit: "sec x lato" }
+                ]},
+                { req: 15, pool: [
+                    { name: "Lucertola (Lizard Pose)", base: 45, inc: 5, unit: "sec x lato" },
+                    { name: "Pinza Seduta             color: var(--zen-accent);
             border-bottom-color: var(--zen-accent);
         }
 
