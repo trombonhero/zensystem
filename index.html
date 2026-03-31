@@ -24,7 +24,6 @@
             color: var(--zen-text);
             font-family: 'Nunito', sans-serif;
             overflow-x: hidden;
-            padding-bottom: 80px; /* Spazio per il timer */
         }
 
         .system-panel {
@@ -177,25 +176,20 @@
             to { transform: translateX(0); opacity: 1; }
         }
 
-        /* Floating Timer Light Theme */
-        .timer-widget {
-            position: fixed;
-            bottom: 1rem;
-            right: 1rem;
-            background: rgba(255, 255, 255, 0.95);
-            border: 1px solid #efeae0;
-            box-shadow: 0 8px 25px rgba(96, 128, 107, 0.15);
-            border-radius: 12px;
-            padding: 0.75rem 1.25rem;
-            z-index: 45;
-            display: flex;
-            align-items: center;
-            gap: 1.25rem;
-            backdrop-filter: blur(5px);
-        }
-
         .hidden { display: none !important; }
         .stat-desc { font-size: 0.75rem; color: #888; display: block; margin-top: 2px; }
+
+        /* Timer in-place */
+        .timer-active-box {
+            background-color: #f0fdf4;
+            border: 2px solid #bbf7d0;
+            border-radius: 8px;
+            padding: 0.5rem 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+        }
     </style>
 </head>
 <body class="p-4 md:p-8 flex flex-col items-center">
@@ -204,21 +198,12 @@
     <audio id="sfx-level-up" src="https://assets.mixkit.co/active_storage/sfx/2000/2000-preview.mp3"></audio>
     <audio id="sfx-click" src="https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3"></audio>
     <audio id="sfx-crit" src="https://assets.mixkit.co/active_storage/sfx/1435/1435-preview.mp3"></audio>
+    
+    <!-- Nuovi Suoni Timer -->
+    <audio id="sfx-tick" src="https://assets.mixkit.co/active_storage/sfx/2569/2569-preview.mp3"></audio> <!-- Countdown leggero -->
+    <audio id="sfx-start-chime" src="https://assets.mixkit.co/active_storage/sfx/2018/2018-preview.mp3"></audio> <!-- Campana inizio/cambio lato -->
 
     <div id="toast-container"></div>
-
-    <!-- Timer Widget -->
-    <div class="timer-widget">
-        <div class="flex flex-col items-center">
-            <span class="text-[10px] text-gray-400 font-bold tracking-widest uppercase">Cronometro</span>
-            <span id="global-timer-display" class="text-2xl font-mono font-black text-gray-700 leading-none mt-1">00:00</span>
-        </div>
-        <div class="flex gap-2">
-            <button onclick="startGlobalTimer()" class="w-9 h-9 flex items-center justify-center bg-green-50 border border-green-200 text-green-600 rounded-lg hover:bg-green-100 transition"><i class="fas fa-play"></i></button>
-            <button onclick="pauseGlobalTimer()" class="w-9 h-9 flex items-center justify-center bg-yellow-50 border border-yellow-200 text-yellow-600 rounded-lg hover:bg-yellow-100 transition"><i class="fas fa-pause"></i></button>
-            <button onclick="resetGlobalTimer()" class="w-9 h-9 flex items-center justify-center bg-red-50 border border-red-200 text-red-500 rounded-lg hover:bg-red-100 transition"><i class="fas fa-redo"></i></button>
-        </div>
-    </div>
 
     <!-- Navigazione Top -->
     <div class="w-full max-w-2xl flex justify-between items-center mb-4 text-sm font-bold text-gray-400">
@@ -272,7 +257,6 @@
                     </div>
                     <div class="flex items-center gap-2">
                         <span id="stb-val" class="font-bold text-xl" style="color: var(--zen-green)">1</span>
-                        <button onclick="addStat('stb')" class="stat-btn hidden text-gray-400 hover:text-green-600 text-2xl transition-colors"><i class="fas fa-plus-circle"></i></button>
                     </div>
                 </div>
                 <div class="stat-row">
@@ -282,7 +266,6 @@
                     </div>
                     <div class="flex items-center gap-2">
                         <span id="flx-val" class="font-bold text-xl" style="color: var(--zen-green)">1</span>
-                        <button onclick="addStat('flx')" class="stat-btn hidden text-gray-400 hover:text-green-600 text-2xl transition-colors"><i class="fas fa-plus-circle"></i></button>
                     </div>
                 </div>
                 <div class="stat-row">
@@ -292,7 +275,6 @@
                     </div>
                     <div class="flex items-center gap-2">
                         <span id="din-val" class="font-bold text-xl" style="color: var(--zen-green)">1</span>
-                        <button onclick="addStat('din')" class="stat-btn hidden text-gray-400 hover:text-green-600 text-2xl transition-colors"><i class="fas fa-plus-circle"></i></button>
                     </div>
                 </div>
                 <div class="stat-row">
@@ -302,15 +284,8 @@
                     </div>
                     <div class="flex items-center gap-2">
                         <span id="cns-val" class="font-bold text-xl" style="color: var(--zen-green)">1</span>
-                        <button onclick="addStat('cns')" class="stat-btn hidden text-gray-400 hover:text-green-600 text-2xl transition-colors"><i class="fas fa-plus-circle"></i></button>
                     </div>
                 </div>
-            </div>
-
-            <div id="stat-points-container" class="mt-6 text-center hidden">
-                <span class="text-white font-bold px-6 py-2 rounded-full uppercase tracking-widest text-xs shadow-md" style="background-color: var(--zen-green)">
-                    Punti Crescita: <span id="stat-points" class="font-black text-lg">0</span>
-                </span>
             </div>
         </div>
 
@@ -428,6 +403,10 @@
         const sfxClick = document.getElementById('sfx-click');
         const sfxLevelUp = document.getElementById('sfx-level-up');
         const sfxCrit = document.getElementById('sfx-crit');
+        
+        // Audio specifici per il Timer
+        const sfxTick = document.getElementById('sfx-tick');
+        const sfxStartChime = document.getElementById('sfx-start-chime');
 
         function playSound(sound) {
             sound.currentTime = 0;
@@ -444,37 +423,172 @@
             setTimeout(() => { toast.remove(); }, 3500);
         }
 
-        // --- TIMER GLOBALE ---
-        let globalTimerInterval = null;
-        let globalTimerSeconds = 0;
+        // --- STATE AND STORAGE ---
+        const STORAGE_PLAYER = 'zen_v5_timer_player';
+        const STORAGE_DAILY = 'zen_v5_timer_daily';
 
-        function updateTimerDisplay() {
-            const m = Math.floor(globalTimerSeconds / 60).toString().padStart(2, '0');
-            const s = (globalTimerSeconds % 60).toString().padStart(2, '0');
-            document.getElementById('global-timer-display').innerText = `${m}:${s}`;
+        let player = {
+            name: "YOGIN", level: 1, xp: 0, xpToNext: 200, 
+            stats: { stb: 1, flx: 1, din: 1, cns: 1 },
+            statPoints: 0, penaltyActive: false
+        };
+
+        let dailyProgress = {
+            date: null, completed: false,
+            exercises: {}, bonusQuest: null, cyclette: null 
+        };
+
+        // --- TIMER LOGIC (Per-Esercizio) ---
+        let activeInterval = null;
+        let activeKey = null; // Indica quale esercizio è in esecuzione
+        let timerState = {};
+
+        function formatTime(secs) {
+            const m = Math.floor(secs / 60).toString().padStart(2, '0');
+            const s = (secs % 60).toString().padStart(2, '0');
+            return `${m}:${s}`;
         }
 
-        function startGlobalTimer() {
+        function startExerciseTimer(key, isCyclette = false) {
+            if (activeInterval) return showToast("Attenzione: Completa prima l'esercizio in corso.", "var(--zen-fire)");
             playSound(sfxClick);
-            if (!globalTimerInterval) {
-                globalTimerInterval = setInterval(() => {
-                    globalTimerSeconds++;
-                    updateTimerDisplay();
-                }, 1000);
+
+            let data = isCyclette ? dailyProgress.cyclette : dailyProgress.exercises[key];
+            
+            // Analizza il tipo di esercizio basandosi sull'unità
+            let isMinutes = data.unit.includes("min");
+            let isTwoSided = data.unit.includes("lato") || data.unit.includes("gamba");
+            let targetSecs = isMinutes ? data.target * 60 : data.target;
+
+            timerState = {
+                key: key,
+                isCyclette: isCyclette,
+                phase: 'prep1', // prep1, run1, prep2, run2
+                timeLeft: 3, // Countdown pre-partenza fisso a 3 secondi
+                targetSecs: targetSecs,
+                isTwoSided: isTwoSided
+            };
+
+            activeKey = key;
+            renderUI(); // Ridisegna per mostrare il timer al posto del bottone
+            activeInterval = setInterval(() => tickTimer(), 1000);
+        }
+
+        function tickTimer() {
+            timerState.timeLeft--;
+
+            // Tick sonoro durante le fasi di preparazione (ultimi 3 secondi)
+            if (timerState.timeLeft > 0 && timerState.timeLeft <= 3 && timerState.phase.includes('prep')) {
+                 playSound(sfxTick);
             }
+
+            if (timerState.timeLeft <= 0) {
+                if (timerState.phase === 'prep1') {
+                    playSound(sfxStartChime); // Partenza ufficiale
+                    timerState.phase = 'run1';
+                    timerState.timeLeft = timerState.targetSecs;
+                } else if (timerState.phase === 'run1') {
+                    if (timerState.isTwoSided) {
+                        playSound(sfxStartChime); // Suono di mezzo per il cambio lato
+                        timerState.phase = 'prep2';
+                        timerState.timeLeft = 3;
+                    } else {
+                        finishExerciseTimer();
+                        return;
+                    }
+                } else if (timerState.phase === 'prep2') {
+                    playSound(sfxStartChime); // Ripartenza per il lato 2
+                    timerState.phase = 'run2';
+                    timerState.timeLeft = timerState.targetSecs;
+                } else if (timerState.phase === 'run2') {
+                    finishExerciseTimer();
+                    return;
+                }
+            }
+            updateActiveTimerUI();
         }
 
-        function pauseGlobalTimer() {
-            playSound(sfxClick);
-            clearInterval(globalTimerInterval);
-            globalTimerInterval = null;
+        function updateActiveTimerUI() {
+            let display = document.getElementById(`timer-text-${activeKey}`);
+            let progress = document.getElementById(`timer-bar-${activeKey}`);
+            if (!display) return;
+
+            let text = "";
+            let pct = 0;
+
+            if(timerState.phase === 'prep1') {
+                text = `PREPARATI: ${timerState.timeLeft}s`;
+                pct = 0;
+            } else if(timerState.phase === 'run1' && timerState.isTwoSided) {
+                text = `LATO 1: ${formatTime(timerState.timeLeft)}`;
+                pct = 100 - ((timerState.timeLeft / timerState.targetSecs) * 100);
+            } else if(timerState.phase === 'run1' && !timerState.isTwoSided) {
+                text = `TEMPO: ${formatTime(timerState.timeLeft)}`;
+                pct = 100 - ((timerState.timeLeft / timerState.targetSecs) * 100);
+            } else if(timerState.phase === 'prep2') {
+                text = `CAMBIO LATO: ${timerState.timeLeft}s`;
+                pct = 0;
+                display.style.color = "var(--zen-fire)"; // Colore diverso per il cambio
+            } else if(timerState.phase === 'run2') {
+                text = `LATO 2: ${formatTime(timerState.timeLeft)}`;
+                pct = 100 - ((timerState.timeLeft / timerState.targetSecs) * 100);
+                display.style.color = "var(--zen-green)";
+            }
+
+            display.innerText = text;
+            if(progress) progress.style.width = `${pct}%`;
         }
 
-        function resetGlobalTimer() {
+        function stopExerciseTimer() {
             playSound(sfxClick);
-            pauseGlobalTimer();
-            globalTimerSeconds = 0;
-            updateTimerDisplay();
+            clearInterval(activeInterval);
+            activeInterval = null;
+            activeKey = null;
+            renderUI(); // Torna allo stato col pulsante Start
+        }
+
+        function finishExerciseTimer() {
+            clearInterval(activeInterval);
+            activeInterval = null;
+            let keyToComplete = activeKey;
+            let wasCyclette = timerState.isCyclette;
+            activeKey = null;
+            
+            playSound(sfxStartChime); // Suono di completamento (campana)
+            
+            if (wasCyclette) {
+                let d = dailyProgress.cyclette;
+                d.current = d.target;
+                d.done = true;
+                const cardioXp = Math.floor(40 + (player.level * 5));
+                player.xp += cardioXp;
+                showToast(`Fuoco Alimentato! +${cardioXp} XP`, "var(--zen-fire)");
+            } else {
+                let d = dailyProgress.exercises[keyToComplete];
+                d.current = d.target;
+                d.done = true;
+            }
+            saveData();
+            renderUI();
+        }
+
+        // Completa manualmente (per esercizi a reps o per saltare il timer)
+        function forceCompleteExercise(key, isCyclette = false) {
+            playSound(sfxClick);
+            if (isCyclette) {
+                let d = dailyProgress.cyclette;
+                d.current = d.target;
+                d.done = true;
+                const cardioXp = Math.floor(40 + (player.level * 5));
+                player.xp += cardioXp;
+                showToast(`Fuoco Alimentato! +${cardioXp} XP`, "var(--zen-fire)");
+            } else {
+                let d = dailyProgress.exercises[key];
+                d.current = d.target;
+                d.done = true;
+            }
+            saveData();
+            renderUI();
         }
 
         // --- INFO MODAL ---
@@ -491,7 +605,6 @@
         }
 
         // --- INFINITE LIBRARY DB ---
-        // Le stat partono da 1, ma gli esercizi "req: 0" sono già avanzati.
         const EXERCISE_LIBRARY = {
             stb: [ 
                 { req: 0, pool: [
@@ -524,7 +637,7 @@
                     { name: "Rollbacks (Dalla schiena ad accosciata)", base: 10, inc: 1, unit: "reps", desc: "Seduto. Rotola indietro sulla schiena e, sfruttando lo slancio, torna su in accosciata senza usare le mani." }
                 ]},
                 { req: 15, pool: [
-                    { name: "Flow Avanzato (Guerriero->Mezzaluna->Skandasana)", base: 4, inc: 1, unit: "flow", desc: "Collega le posizioni senza appoggiare mani a terra o fermarti. Sfida totale di equilibrio e fluidità." },
+                    { name: "Flow Avanzato (Guerriero->Mezzaluna->Skandasana)", base: 4, inc: 1, unit: "flow completi", desc: "Collega le posizioni senza appoggiare mani a terra o fermarti. Sfida totale di equilibrio e fluidità." },
                     { name: "Ponte Dinamico (Setu Bandha continuo)", base: 20, inc: 2, unit: "reps lente", desc: "Supino, solleva il bacino contraendo i glutei, scendi sfiorando terra e risali. Movimento lento e continuo." }
                 ]}
             ],
@@ -558,28 +671,11 @@
 
         const ICONS = { stb: "fa-mountain", flx: "fa-water", din: "fa-fire", cns: "fa-om" };
         
-        // --- STATE ---
-        const STORAGE_PLAYER = 'zen_v4_light_player'; // Nuova chiave per partire puliti a livello 1
-        const STORAGE_DAILY = 'zen_v4_light_daily';
-
-        // Partiamo a LV 1, statistiche a 1. Gli esercizi base sono le pose avanzate.
-        let player = {
-            name: "YOGIN", level: 1, xp: 0, xpToNext: 200, 
-            stats: { stb: 1, flx: 1, din: 1, cns: 1 },
-            statPoints: 0, penaltyActive: false
-        };
-
-        let dailyProgress = {
-            date: null, completed: false,
-            exercises: {}, bonusQuest: null, cyclette: null 
-        };
-
+        // --- INIZIALIZZAZIONE ---
         function init() {
             loadData();
             checkDateLogic();
             renderUI();
-            startCountdownClock();
-            updateTimerDisplay();
         }
 
         function toggleSettings() {
@@ -587,16 +683,21 @@
             document.getElementById('settings-panel').classList.toggle('hidden');
         }
 
+        function saveData() {
+            localStorage.setItem(STORAGE_PLAYER, JSON.stringify(player));
+            localStorage.setItem(STORAGE_DAILY, JSON.stringify(dailyProgress));
+        }
+
         function loadData() {
             const savedPlayer = localStorage.getItem(STORAGE_PLAYER);
             const savedDaily = localStorage.getItem(STORAGE_DAILY);
             if (savedPlayer) player = JSON.parse(savedPlayer);
             if (savedDaily) dailyProgress = JSON.parse(savedDaily);
-        }
 
-        function saveData() {
-            localStorage.setItem(STORAGE_PLAYER, JSON.stringify(player));
-            localStorage.setItem(STORAGE_DAILY, JSON.stringify(dailyProgress));
+            if(dailyProgress && !dailyProgress.cyclette && !dailyProgress.completed) {
+                generateCycletteQuest();
+                saveData(); 
+            }
         }
 
         function exportData() {
@@ -637,6 +738,7 @@
             if (!dailyProgress.date) {
                 dailyProgress.date = today;
                 generateDailyQuest();
+                saveData(); 
                 return;
             }
             if (dailyProgress.date !== today) {
@@ -645,6 +747,9 @@
                 }
                 dailyProgress.date = today;
                 dailyProgress.completed = false;
+                // Ferma eventuali timer vecchi se rimasti aperti da ieri
+                if(activeInterval) stopExerciseTimer();
+                
                 generateDailyQuest();
                 saveData();
             }
@@ -653,17 +758,14 @@
         function getRandomAsana(type) {
             const tiers = EXERCISE_LIBRARY[type];
             let bestTier = tiers[0];
-            
             for (let i = tiers.length - 1; i >= 0; i--) {
                 if (player.stats[type] >= tiers[i].req) {
                     bestTier = tiers[i];
                     break;
                 }
             }
-            
             const pool = bestTier.pool;
-            const randomIndex = Math.floor(Math.random() * pool.length);
-            return pool[randomIndex];
+            return pool[Math.floor(Math.random() * pool.length)];
         }
 
         function generateCycletteQuest() {
@@ -725,6 +827,7 @@
             }, 1000);
         }
 
+        // --- MAIN RENDER ---
         function renderUI() {
             document.getElementById('level-display').innerText = player.level;
             document.getElementById('stb-val').innerText = player.stats.stb;
@@ -740,17 +843,6 @@
             else if (player.level < 25) titleEl.innerText = "Radice (Esperto)";
             else if (player.level < 40) titleEl.innerText = "Fusto (Maestro)";
             else titleEl.innerText = "Fioritura (Risvegliato)";
-
-            const ptsContainer = document.getElementById('stat-points-container');
-            const statBtns = document.querySelectorAll('.stat-btn');
-            if (player.statPoints > 0) {
-                ptsContainer.classList.remove('hidden');
-                document.getElementById('stat-points').innerText = player.statPoints;
-                statBtns.forEach(btn => btn.classList.remove('hidden'));
-            } else {
-                ptsContainer.classList.add('hidden');
-                statBtns.forEach(btn => btn.classList.add('hidden'));
-            }
 
             if (player.penaltyActive) {
                 document.getElementById('penalty-overlay').classList.remove('hidden');
@@ -787,6 +879,7 @@
             }
         }
 
+        // --- RENDER CYCLETTE (Con Timer Integrato) ---
         function renderCyclette() {
             const container = document.getElementById('cardio-content');
             const data = dailyProgress.cyclette;
@@ -795,7 +888,24 @@
                 return;
             }
 
-            const percent = Math.min(100, (data.current / data.target) * 100);
+            // Se questo esercizio è il timer attivo
+            if (activeKey === 'cyclette') {
+                container.innerHTML = `
+                    <div class="timer-active-box flex-col sm:flex-row gap-3 mb-2" style="background-color: #fff1f2; border-color: #fecdd3;">
+                        <div class="flex items-center gap-3 w-full sm:w-auto">
+                            <i class="fas fa-bicycle text-2xl" style="color: var(--zen-fire)"></i>
+                            <span class="font-bold text-gray-800 text-lg">${data.name}</span>
+                        </div>
+                        <div class="flex items-center gap-4 w-full sm:w-auto justify-between sm:justify-end">
+                            <span id="timer-text-cyclette" class="font-mono text-xl font-black" style="color: var(--zen-fire)">Prep: 3s</span>
+                            <button onclick="stopExerciseTimer()" class="px-4 py-2 border border-red-200 bg-white rounded font-bold text-red-500 hover:bg-red-50 transition-colors"><i class="fas fa-stop"></i></button>
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+
+            // Vista Normale
             container.innerHTML = `
                 <div class="flex justify-between items-center mb-4 relative z-10">
                     <div class="flex items-center gap-4">
@@ -804,37 +914,16 @@
                             <span class="font-bold text-gray-800 block text-lg tracking-wide leading-tight pr-2">${data.name}</span>
                         </div>
                     </div>
-                    <span class="font-mono text-xl font-black text-gray-800 ml-2 whitespace-nowrap">${data.current} / ${data.target} <span class="text-xs font-sans text-gray-500 font-bold uppercase">${data.unit}</span></span>
+                    <span class="font-mono text-xl font-black text-gray-800 ml-2 whitespace-nowrap">${data.target} <span class="text-xs font-sans text-gray-500 font-bold uppercase">${data.unit}</span></span>
                 </div>
-                <div class="h-2 progress-bg w-full mb-4 rounded overflow-hidden">
-                    <div class="h-full progress-fire transition-all duration-300" style="width: ${percent}%;"></div>
-                </div>
-                <div class="flex gap-2 justify-end">
-                    <button onclick="updateCyclette(5)" class="px-4 py-2 border border-gray-200 bg-white rounded font-bold text-gray-600 hover:bg-gray-50 transition-colors">+5m</button>
-                    <button onclick="updateCyclette(10)" class="px-4 py-2 border border-gray-200 bg-white rounded font-bold text-gray-600 hover:bg-gray-50 transition-colors">+10m</button>
-                    <button onclick="updateCyclette(${data.target})" class="px-6 py-2 text-white rounded font-bold hover:opacity-90 ml-2 transition-colors shadow-sm" style="background-color: var(--zen-fire); border: none;"><i class="fas fa-check"></i></button>
+                <div class="flex gap-2 justify-end w-full">
+                    <button onclick="startExerciseTimer('cyclette', true)" class="w-full py-3 bg-white border border-gray-200 rounded-lg font-bold hover:bg-gray-50 transition-colors text-lg" style="color: var(--zen-fire)"><i class="fas fa-play mr-2"></i> Avvia Timer</button>
+                    <button onclick="forceCompleteExercise('cyclette', true)" class="px-4 py-3 bg-white border border-gray-200 rounded-lg font-bold text-gray-400 hover:bg-gray-50 transition-colors" title="Segna Completato Senza Timer"><i class="fas fa-check"></i></button>
                 </div>
             `;
         }
 
-        function updateCyclette(amount) {
-            playSound(sfxClick);
-            const data = dailyProgress.cyclette;
-            if (amount === data.target) data.current = data.target;
-            else data.current += amount;
-            
-            if (data.current >= data.target) {
-                data.current = data.target;
-                data.done = true;
-                const cardioXp = Math.floor(40 + (player.level * 5));
-                player.xp += cardioXp;
-                playSound(sfxCrit);
-                showToast(`Calore generato. +${cardioXp} XP`, "var(--zen-fire)");
-            }
-            saveData();
-            renderUI();
-        }
-
+        // --- RENDER QUESTS (Con Timer Integrato e Distinzione Reps/Time) ---
         function renderQuestList() {
             const list = document.getElementById('quest-list');
             list.innerHTML = '';
@@ -843,36 +932,64 @@
             for (let key in dailyProgress.exercises) {
                 const data = dailyProgress.exercises[key];
                 if (!data.done) allDone = false;
-                const percent = Math.min(100, (data.current / data.target) * 100);
                 const iconClass = ICONS[key];
                 
                 const item = document.createElement('div');
                 item.className = "bg-white p-5 border border-gray-200 rounded-xl shadow-sm mb-4 relative overflow-hidden";
-                item.innerHTML = `
-                    <div class="flex justify-between items-center mb-4 relative z-10">
-                        <div class="flex items-center gap-4">
-                            <i class="fas fa-info-circle info-btn text-2xl" onclick="showInfo('${data.name}', '${data.desc.replace(/'/g, "\\'")}')"></i>
-                            <div>
-                                <span class="font-bold text-gray-800 block text-lg pr-2 leading-tight tracking-wide">${data.name}</span>
+                
+                // Se questo è il timer attivo
+                if (activeKey === key) {
+                    item.innerHTML = `
+                        <div class="timer-active-box flex-col sm:flex-row gap-3">
+                            <div class="flex items-center gap-3 w-full sm:w-auto">
+                                <i class="fas ${iconClass} text-2xl" style="color: var(--zen-green)"></i>
+                                <span class="font-bold text-gray-800 text-lg leading-tight">${data.name}</span>
+                            </div>
+                            <div class="flex items-center gap-4 w-full sm:w-auto justify-between sm:justify-end">
+                                <span id="timer-text-${key}" class="font-mono text-xl font-black" style="color: var(--zen-green)">Prep: 3s</span>
+                                <button onclick="stopExerciseTimer()" class="px-4 py-2 border border-red-200 bg-white rounded font-bold text-red-500 hover:bg-red-50 transition-colors"><i class="fas fa-stop"></i></button>
                             </div>
                         </div>
-                        <span class="font-mono text-xl font-black text-gray-800 ml-2 whitespace-nowrap">${data.current} / ${data.target} <span class="text-xs font-sans text-gray-500 font-bold uppercase">${data.unit}</span></span>
-                    </div>
-                    <div class="absolute bottom-0 left-0 h-1 progress-bg w-full z-0">
-                        <div class="h-full transition-all duration-300 progress-fill" style="width: ${percent}%;"></div>
-                    </div>
-                    <div class="flex gap-2 mt-2 relative z-10 justify-end">
-                        <button onclick="updateExercise('${key}', -1)" class="px-4 py-2 border border-gray-200 rounded text-gray-500 font-bold hover:bg-gray-50 transition-colors">-</button>
-                        <button onclick="updateExercise('${key}', 1)" class="px-4 py-2 border border-gray-200 rounded text-gray-500 font-bold hover:bg-gray-50 transition-colors">+1</button>
-                        <button onclick="updateExercise('${key}', 5)" class="px-4 py-2 border border-gray-200 rounded text-gray-500 font-bold hover:bg-gray-50 transition-colors">+5</button>
-                        <button onclick="updateExercise('${key}', ${data.target})" class="px-6 py-2 border text-white rounded font-bold hover:opacity-90 ml-2 transition-colors shadow-sm" style="background-color: var(--zen-green); border: none;"><i class="fas fa-check"></i></button>
-                    </div>
-                `;
+                    `;
+                } 
+                // Se è completato o non è il timer attivo
+                else {
+                    let isTimeBased = data.unit.includes("sec") || data.unit.includes("min");
+                    
+                    let actionArea = "";
+                    if (data.done) {
+                        actionArea = `<div class="text-right w-full font-bold uppercase tracking-wider" style="color: var(--zen-green)"><i class="fas fa-check-circle"></i> Fatto</div>`;
+                    } else if (isTimeBased) {
+                        actionArea = `
+                            <button onclick="startExerciseTimer('${key}', false)" class="flex-1 py-2 border border-gray-200 rounded-lg font-bold hover:bg-gray-50 transition-colors text-md" style="color: var(--zen-green)"><i class="fas fa-play mr-2"></i> INIZIA TIMER</button>
+                            <button onclick="forceCompleteExercise('${key}', false)" class="px-4 py-2 border border-gray-200 rounded-lg text-gray-400 hover:bg-gray-50 transition-colors" title="Segna Completato"><i class="fas fa-check"></i></button>
+                        `;
+                    } else {
+                        actionArea = `
+                            <button onclick="forceCompleteExercise('${key}', false)" class="w-full py-2 border border-gray-200 rounded-lg font-bold hover:bg-gray-50 transition-colors text-md tracking-wider uppercase" style="color: var(--zen-green); background-color: transparent;"><i class="fas fa-check mr-2"></i> Segna Completato</button>
+                        `;
+                    }
+
+                    item.innerHTML = `
+                        <div class="flex justify-between items-center mb-4 relative z-10">
+                            <div class="flex items-center gap-4">
+                                <i class="fas fa-info-circle info-btn text-2xl" onclick="showInfo('${data.name}', '${data.desc.replace(/'/g, "\\'")}')"></i>
+                                <div>
+                                    <span class="font-bold text-gray-800 block text-lg pr-2 leading-tight tracking-wide">${data.name}</span>
+                                </div>
+                            </div>
+                            <span class="font-mono text-xl font-black text-gray-800 ml-2 whitespace-nowrap">${data.target} <span class="text-xs font-sans text-gray-500 font-bold uppercase">${data.unit}</span></span>
+                        </div>
+                        <div class="flex gap-2 w-full mt-2 relative z-10">
+                            ${actionArea}
+                        </div>
+                    `;
+                }
                 list.appendChild(item);
             }
 
             const completeBtn = document.getElementById('complete-quest-btn');
-            completeBtn.disabled = !allDone;
+            completeBtn.disabled = !allDone || activeKey !== null; // Disabilita anche se un timer è in corso
             if (allDone) {
                 completeBtn.style.backgroundColor = "var(--zen-green)";
                 completeBtn.style.color = "#fff";
@@ -884,22 +1001,7 @@
             }
         }
 
-        function updateExercise(key, amount) {
-            playSound(sfxClick);
-            const data = dailyProgress.exercises[key];
-            if (amount === data.target) data.current = data.target;
-            else data.current += amount;
-            
-            if (data.current < 0) data.current = 0;
-            if (data.current >= data.target) {
-                data.current = data.target;
-                data.done = true;
-            } else data.done = false;
-            
-            saveData();
-            renderUI();
-        }
-
+        // --- AZIONI ---
         function completeBonusQuest() {
             playSound(sfxClick);
             if(dailyProgress.bonusQuest) {
@@ -941,30 +1043,6 @@
             playSound(sfxClick);
             document.getElementById('reward-modal').classList.remove('active');
             location.reload(); 
-        }
-
-        function addStat(stat) {
-            if (player.statPoints > 0) {
-                playSound(sfxClick);
-                player.stats[stat]++;
-                player.statPoints--;
-                saveData();
-                renderUI();
-            }
-        }
-
-        function startCountdownClock() {
-            setInterval(() => {
-                const now = new Date();
-                const tomorrow = new Date(now);
-                tomorrow.setDate(tomorrow.getDate() + 1);
-                tomorrow.setHours(0, 0, 0, 0);
-                const diff = tomorrow - now;
-                const h = Math.floor(diff/(1000*60*60));
-                const m = Math.floor((diff%(1000*60*60))/(1000*60));
-                const el = document.getElementById('countdown');
-                if(el) el.innerText = `PROSSIMO CICLO TRA: ${h}H ${m}M`;
-            }, 60000);
         }
 
         init();
