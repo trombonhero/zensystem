@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ZEN SYSTEM - Loto Infinito Avanzato</title>
+    <title>ZEN SYSTEM - La Via della Maestria</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
@@ -24,6 +24,7 @@
             color: var(--zen-text);
             font-family: 'Nunito', sans-serif;
             overflow-x: hidden;
+            padding-bottom: 30px;
         }
 
         .system-panel {
@@ -44,1008 +45,334 @@
         }
 
         .stat-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0.75rem 0;
-            border-bottom: 1px solid #f5f5f5;
-        }
-
-        .glow-text {
-            color: var(--zen-green);
-            font-weight: 800;
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 0.75rem 0; border-bottom: 1px solid #f5f5f5;
         }
 
         .btn-system {
-            background: transparent;
-            border: 2px solid var(--zen-green);
-            color: var(--zen-green);
-            text-transform: uppercase;
-            font-weight: bold;
-            border-radius: 30px;
-            transition: all 0.3s ease;
-            cursor: pointer;
+            background: transparent; border: 2px solid var(--zen-green);
+            color: var(--zen-green); text-transform: uppercase; font-weight: bold;
+            border-radius: 30px; transition: all 0.3s ease; cursor: pointer;
         }
 
         .btn-system:hover:not(:disabled) {
-            background: var(--zen-green);
-            color: #fff;
-            transform: translateY(-1px);
-            box-shadow: 0 6px 15px rgba(96, 128, 107, 0.2);
+            background: var(--zen-green); color: #fff;
         }
 
-        .btn-system:disabled {
-            border-color: #d1d1d1;
-            color: #d1d1d1;
-            cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
-        }
+        .info-btn { color: #a0aec0; cursor: pointer; }
+        .info-btn:hover { color: var(--zen-green); }
 
-        .info-btn {
-            color: #a0aec0;
-            transition: color 0.2s;
-            cursor: pointer;
-        }
-        .info-btn:hover {
-            color: var(--zen-green);
-        }
-
-        /* Missione Intenzione */
-        .hidden-quest-panel {
-            border: 1px solid var(--zen-accent);
-            background: #fffdfa;
-        }
-        .hidden-quest-header {
-            color: var(--zen-accent);
-            border-bottom-color: var(--zen-accent);
-        }
-
-        /* Cardio */
-        .cardio-panel {
-            border: 2px dashed var(--zen-fire);
-            background: #fffcfb;
-        }
-        .cardio-header {
-            color: var(--zen-fire);
-            border-bottom: none;
-        }
-
-        /* Riallineamento (Penalty) */
-        .penalty-mode {
-            background: #fff !important;
-            border: 2px solid var(--zen-lavender) !important;
-            box-shadow: 0 0 40px rgba(181, 164, 191, 0.4) !important;
-        }
-        .penalty-overlay {
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(250, 247, 242, 0.95);
-            z-index: 50;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
+        .timer-active-box {
+            background-color: #f0fdf4; border: 2px solid #bbf7d0;
+            border-radius: 12px; padding: 0.75rem 1rem;
+            display: flex; justify-content: space-between; align-items: center; width: 100%;
         }
 
         .modal-overlay {
-            background: rgba(250, 247, 242, 0.9);
-            position: fixed;
+            background: rgba(250, 247, 242, 0.9); position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 60;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.3s;
+            display: flex; justify-content: center; align-items: center;
+            z-index: 60; opacity: 0; pointer-events: none; transition: opacity 0.3s;
             backdrop-filter: blur(5px);
         }
-        .modal-overlay.active {
-            opacity: 1;
-            pointer-events: all;
-        }
-        .system-alert {
-            background: #fff;
-            border: 2px solid var(--zen-green);
-            border-radius: 20px;
-            max-width: 90%;
-            width: 420px;
-            padding: 2.5rem;
-            text-align: center;
-            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.1);
-        }
-
+        .modal-overlay.active { opacity: 1; pointer-events: all; }
+        
+        .hidden { display: none !important; }
         .progress-fill { background: var(--zen-green); border-radius: 6px; }
         .progress-fire { background: var(--zen-fire); border-radius: 6px; }
         .progress-bg { background: #e8e8e8; border-radius: 6px; }
-
-        #toast-container { position: fixed; top: 20px; right: 20px; z-index: 100; }
-        .toast {
-            background: #fff;
-            color: var(--zen-text);
-            padding: 1rem 1.5rem;
-            margin-bottom: 0.5rem;
-            border-radius: 8px;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
-            animation: slideIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-            font-weight: 600;
-        }
-        @keyframes slideIn {
-            from { transform: translateX(100%); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
-        }
-
-        .hidden { display: none !important; }
-        .stat-desc { font-size: 0.75rem; color: #888; display: block; margin-top: 2px; }
-
-        /* Timer in-place */
-        .timer-active-box {
-            background-color: #f0fdf4;
-            border: 2px solid #bbf7d0;
-            border-radius: 8px;
-            padding: 0.5rem 1rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            width: 100%;
-        }
     </style>
 </head>
 <body class="p-4 md:p-8 flex flex-col items-center">
 
-    <!-- AUDIO -->
     <audio id="sfx-level-up" src="https://assets.mixkit.co/active_storage/sfx/2000/2000-preview.mp3"></audio>
     <audio id="sfx-click" src="https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3"></audio>
-    <audio id="sfx-crit" src="https://assets.mixkit.co/active_storage/sfx/1435/1435-preview.mp3"></audio>
-    
-    <!-- Nuovi Suoni Timer -->
-    <audio id="sfx-tick" src="https://assets.mixkit.co/active_storage/sfx/2569/2569-preview.mp3"></audio> <!-- Countdown leggero -->
-    <audio id="sfx-start-chime" src="https://assets.mixkit.co/active_storage/sfx/2018/2018-preview.mp3"></audio> <!-- Campana inizio/cambio lato -->
+    <audio id="sfx-start-chime" src="https://assets.mixkit.co/active_storage/sfx/2018/2018-preview.mp3"></audio>
 
-    <div id="toast-container"></div>
+    <div id="toast-container" class="fixed top-5 right-5 z-[100]"></div>
 
-    <!-- Navigazione Top -->
-    <div class="w-full max-w-2xl flex justify-between items-center mb-4 text-sm font-bold text-gray-400">
-        <div>
-            <button onclick="toggleSettings()" class="hover:text-gray-700 px-3 py-2 border border-gray-200 rounded-xl bg-white shadow-sm transition-colors"><i class="fas fa-cog"></i> GESTIONE PRATICA</button>
-        </div>
+    <div class="w-full max-w-2xl flex justify-between items-center mb-4">
+        <button onclick="toggleSettings()" class="text-sm font-bold text-gray-400 hover:text-gray-700">
+            <i class="fas fa-cog"></i> SISTEMA
+        </button>
     </div>
 
-    <!-- Impostazioni -->
     <div id="settings-panel" class="w-full max-w-2xl system-panel p-5 mb-4 hidden">
-        <h2 class="text-lg text-gray-700 border-b border-gray-200 mb-4 pb-2 font-bold">Dati del Loto</h2>
-        <div class="flex flex-col gap-4">
-            <button onclick="exportData()" class="btn-system py-2 text-sm"><i class="fas fa-download"></i> Custodisci Backup</button>
-            <div class="relative">
-                <input type="file" id="import-file" accept=".json" class="hidden" onchange="importData(event)">
-                <button onclick="document.getElementById('import-file').click()" class="btn-system py-2 text-sm w-full" style="border-color: var(--zen-accent); color: var(--zen-accent);"><i class="fas fa-upload"></i> Ripristina Percorso</button>
-            </div>
+        <h2 class="text-lg text-gray-700 border-b mb-4 pb-2 font-bold">Backup Maestria</h2>
+        <div class="flex flex-col gap-3">
+            <button onclick="exportData()" class="btn-system py-2 text-sm">Esporta Dati</button>
+            <input type="file" id="import-file" accept=".json" class="hidden" onchange="importData(event)">
+            <button onclick="document.getElementById('import-file').click()" class="btn-system py-2 text-sm" style="border-color: var(--zen-accent); color: var(--zen-accent);">Importa Backup</button>
         </div>
     </div>
 
-    <div id="main-container" class="w-full max-w-2xl transition-all duration-500">
-        
-        <!-- Status Principale -->
-        <div class="system-panel p-6 mb-6 relative">
-            <h1 class="text-2xl font-black tracking-widest text-center text-gray-700 mb-6">IL TUO LOTO</h1>
-            
-            <div class="grid grid-cols-2 gap-4 mb-6">
-                <div>
-                    <div class="text-gray-400 text-xs uppercase tracking-wider font-bold">PRATICANTE</div>
-                    <div class="text-2xl font-black text-gray-700" id="player-name">YOGIN</div>
-                </div>
-                <div class="text-right">
-                    <div class="text-gray-400 text-xs uppercase tracking-wider font-bold">FIORITURA</div>
-                    <div class="text-md font-black" style="color: var(--zen-accent);" id="player-title">Seme (Avanzato)</div>
-                </div>
+    <div id="main-container" class="w-full max-w-2xl">
+        <div class="system-panel p-6 mb-6">
+            <h1 class="text-2xl font-black text-center text-gray-700 mb-6 tracking-widest">VIA DELLA MAESTRIA</h1>
+            <div class="flex justify-between items-end mb-2">
+                <span class="text-5xl font-black text-gray-700">LV. <span id="level-display">1</span></span>
+                <span id="player-title" class="text-sm font-bold text-gray-400 uppercase">Seme</span>
             </div>
-
-            <div class="flex items-end gap-2 mb-2">
-                <span class="text-5xl font-black text-gray-700">LV. <span id="level-display" class="glow-text">1</span></span>
-            </div>
-
-            <div class="w-full progress-bg h-3 mb-8 relative overflow-hidden">
+            <div class="w-full progress-bg h-2 mb-8 overflow-hidden">
                 <div id="xp-bar" class="progress-fill h-full transition-all duration-700" style="width: 0%"></div>
             </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-5 text-sm">
-                <div class="stat-row">
-                    <div>
-                        <span class="text-gray-700 font-bold block text-base">STABILITÀ (STB)</span>
-                        <span class="stat-desc">Forza del tronco ed equilibrio</span>
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <span id="stb-val" class="font-bold text-xl" style="color: var(--zen-green)">1</span>
-                    </div>
-                </div>
-                <div class="stat-row">
-                    <div>
-                        <span class="text-gray-700 font-bold block text-base">FLESSIBILITÀ (FLX)</span>
-                        <span class="stat-desc">Apertura profonda e distensione</span>
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <span id="flx-val" class="font-bold text-xl" style="color: var(--zen-green)">1</span>
-                    </div>
-                </div>
-                <div class="stat-row">
-                    <div>
-                        <span class="text-gray-700 font-bold block text-base">DINAMISMO (DIN)</span>
-                        <span class="stat-desc">Flusso vitale e calore (Agni)</span>
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <span id="din-val" class="font-bold text-xl" style="color: var(--zen-green)">1</span>
-                    </div>
-                </div>
-                <div class="stat-row">
-                    <div>
-                        <span class="text-gray-700 font-bold block text-base">CONSAPEVOLEZZA (CNS)</span>
-                        <span class="stat-desc">Focus mentale e presenza</span>
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <span id="cns-val" class="font-bold text-xl" style="color: var(--zen-green)">1</span>
-                    </div>
-                </div>
+            <div class="grid grid-cols-2 gap-4 text-sm">
+                <div class="stat-row"><span>Stabilità</span><span id="stb-val" class="font-bold">1</span></div>
+                <div class="stat-row"><span>Flessibilità</span><span id="flx-val" class="font-bold">1</span></div>
+                <div class="stat-row"><span>Dinamismo</span><span id="din-val" class="font-bold">1</span></div>
+                <div class="stat-row"><span>Presenza</span><span id="cns-val" class="font-bold">1</span></div>
             </div>
         </div>
 
-        <!-- Bonus Intenzione -->
-        <div id="bonus-quest-panel" class="system-panel p-5 mb-5 hidden-quest-panel hidden">
-            <div class="system-header hidden-quest-header flex justify-between items-center text-sm border-none mb-0 pb-2">
-                <span><i class="fas fa-spa"></i> INTENZIONE DEL GIORNO</span>
-                <span class="text-xs px-2 py-1 rounded font-bold" style="background: rgba(196,150,103,0.1); color: var(--zen-accent)">CURA DI SÉ</span>
-            </div>
-            <div class="flex items-center justify-between mb-4 mt-2 gap-3">
-                <p id="bonus-quest-desc" class="text-lg text-gray-700 italic text-center w-full leading-tight">"..."</p>
-                <i class="fas fa-info-circle info-btn text-xl" id="bonus-info-btn"></i>
-            </div>
-            <div class="flex justify-center">
-                <button onclick="completeBonusQuest()" class="px-8 py-2 border-2 rounded-full font-bold transition-all uppercase tracking-wider text-sm hover:bg-orange-50" style="border-color: var(--zen-accent); color: var(--zen-accent)">
-                    Compiuta
-                </button>
-            </div>
+        <div id="cardio-panel" class="system-panel p-5 mb-6 border-dashed border-2" style="border-color: var(--zen-fire)">
+            <h3 class="font-bold text-sm mb-3" style="color: var(--zen-fire)">IL CAMMINO DEL FUOCO (15 MIN CYCLETTE)</h3>
+            <div id="cardio-content"></div>
         </div>
 
-        <!-- Cyclette Cardio (Focus Dimagrimento) -->
-        <div id="cardio-panel" class="system-panel cardio-panel p-5 mb-6">
-            <div class="system-header cardio-header flex justify-between items-center text-sm">
-                <span><i class="fas fa-fire"></i> IL FUOCO INTERIORE (CYCLETTE)</span>
-                <span class="text-xs px-2 py-1 rounded font-bold" style="background: rgba(212,107,83,0.1); color: var(--zen-fire)">FACOLTATIVO</span>
-            </div>
-            <div id="cardio-content" class="mt-3">
-                <!-- Populated by JS -->
-            </div>
-        </div>
-
-        <!-- Pratica Quotidiana -->
-        <div id="quest-panel" class="system-panel p-6">
-            <div class="system-header flex justify-between items-center">
-                <span>PRATICA QUOTIDIANA</span>
-            </div>
-
-            <div class="space-y-4" id="quest-list">
-                <!-- Populated by JS -->
-            </div>
-
-            <div id="quest-status-area" class="mt-8 text-center">
-                <button id="complete-quest-btn" onclick="finishDailyQuest()" class="btn-system w-full py-4 text-xl tracking-widest" disabled>
-                    CONCLUDI PRATICA
-                </button>
-                <div class="text-xs text-gray-400 mt-4 uppercase tracking-widest">Ascolta il respiro. Rispetta i tuoi limiti.</div>
-            </div>
-            
-            <div id="quest-completed-msg" class="hidden text-center py-10">
-                <i class="fas fa-om text-5xl mb-4" style="color: var(--zen-green)"></i>
-                <h3 class="text-3xl text-gray-700 font-black mb-2 uppercase tracking-widest">NAMASTÉ</h3>
-                <p class="text-gray-500 font-bold">La pratica odierna è fiorita. Riposa in pace.</p>
-                <div class="mt-6 text-sm text-gray-500 font-mono bg-gray-100 py-2 rounded-lg inline-block px-5 font-bold" id="countdown"></div>
+        <div class="system-panel p-6">
+            <h2 class="system-header">Pratica Quotidiana (Fissa)</h2>
+            <div id="quest-list" class="space-y-4"></div>
+            <div class="mt-8">
+                <button id="complete-quest-btn" onclick="finishDailyQuest()" class="btn-system w-full py-4 text-xl tracking-widest" disabled>CONCLUDI PRATICA</button>
             </div>
         </div>
     </div>
 
-    <!-- Riallineamento (Penalty) -->
-    <div id="penalty-overlay" class="hidden penalty-overlay">
-        <div class="system-panel p-10 max-w-lg w-full text-center penalty-mode">
-            <i class="fas fa-wind text-6xl mb-6" style="color: var(--zen-lavender)"></i>
-            <h1 class="text-4xl font-black text-gray-700 mb-3 uppercase tracking-widest">RIALLINEAMENTO</h1>
-            <p class="text-gray-600 font-bold mb-8">Hai perso il contatto con la pratica. Nessun giudizio. Ricentriamoci.</p>
-            
-            <div class="rounded-xl p-6 border-2 mb-8" style="background: #faf8fc; border-color: #e5dde9">
-                <h3 class="text-2xl font-black mb-3 uppercase" style="color: #6a577c">Malasana (Yogi Squat)</h3>
-                <p class="text-sm text-gray-600 mb-5 font-bold">Scendi in accosciata profonda. Talloni a terra o su un supporto. Gomiti contro le ginocchia, mani unite. Respira nel bacino.</p>
-                <div class="text-6xl font-black font-mono my-2" style="color: var(--zen-lavender)" id="penalty-timer">02:00</div>
-            </div>
-            
-            <button onclick="startPenaltyTimer()" id="start-penalty-btn" class="btn-system w-full py-4 text-xl font-black hover:bg-purple-50" style="border-color: var(--zen-lavender); color: var(--zen-lavender);">
-                INIZIA A RESPIRARE
-            </button>
-        </div>
-    </div>
-
-    <!-- Reward Modal -->
-    <div id="reward-modal" class="modal-overlay">
-        <div class="system-alert transform scale-95 transition-transform duration-200">
-            <h2 class="text-3xl font-black text-gray-700 mb-6 uppercase tracking-widest">FIORITURA</h2>
-            <div class="space-y-4 text-left mb-8 mt-4 font-bold text-gray-600">
-                <div class="flex justify-between border-b border-gray-100 py-3">
-                    <span>Pace Mentale</span>
-                    <span style="color: var(--zen-green)">Ristabilita</span>
-                </div>
-                <div class="flex justify-between border-b border-gray-100 py-3">
-                    <span>Punti Crescita</span>
-                    <span style="color: var(--zen-accent)">+3</span>
-                </div>
-                <div class="flex justify-between py-3">
-                    <span>Esperienza (Prana)</span>
-                    <span class="text-xl" style="color: var(--zen-green)" id="xp-gain-display">+100</span>
-                </div>
-            </div>
-            <button onclick="closeModal()" class="btn-system px-8 py-4 w-full text-xl font-black hover:bg-green-50">TORNA AL PRESENTE</button>
-        </div>
-    </div>
-
-    <!-- Modal Informazioni Esercizio -->
     <div id="info-modal" class="modal-overlay" onclick="if(event.target===this) closeInfoModal()">
-        <div class="system-alert !p-6" style="border-radius: 16px; border-width: 2px;">
-            <div class="flex items-center justify-center mb-4">
-                <i class="fas fa-book-open text-2xl mr-3" style="color: var(--zen-green)"></i>
-                <h3 id="info-title" class="text-2xl font-bold text-gray-800 uppercase tracking-widest">Titolo</h3>
-            </div>
-            <div class="bg-gray-50 border border-gray-200 p-5 rounded-xl text-left mb-6">
-                <p id="info-desc" class="text-gray-600 text-md leading-relaxed font-medium">Descrizione</p>
-            </div>
-            <button onclick="closeInfoModal()" class="btn-system w-full py-3 rounded-full tracking-widest hover:bg-green-50">CHIUDI MANUALE</button>
+        <div class="system-alert !p-6">
+            <h3 id="info-title" class="text-2xl font-bold text-gray-800 mb-4"></h3>
+            <div class="bg-gray-50 p-5 rounded-xl text-left mb-6 text-gray-600 font-medium" id="info-desc"></div>
+            <button onclick="closeInfoModal()" class="btn-system w-full py-3 rounded-full">RITORNA</button>
         </div>
     </div>
 
     <script>
-        // --- AUDIO ---
-        const sfxClick = document.getElementById('sfx-click');
-        const sfxLevelUp = document.getElementById('sfx-level-up');
-        const sfxCrit = document.getElementById('sfx-crit');
-        
-        // Audio specifici per il Timer
-        const sfxTick = document.getElementById('sfx-tick');
-        const sfxStartChime = document.getElementById('sfx-start-chime');
+        const STORAGE_PLAYER = 'zen_v4_light_player';
+        const STORAGE_DAILY = 'zen_v4_light_daily';
 
-        function playSound(sound) {
-            sound.currentTime = 0;
-            sound.play().catch(e => {});
+        let player = { level: 1, xp: 0, xpToNext: 200, stats: { stb: 1, flx: 1, din: 1, cns: 1 } };
+        let dailyProgress = { date: null, completed: false, exercises: {}, cyclette: { done: false } };
+
+        const SEQUENZA_FISSA = [
+            { 
+                id: 'stb', name: "Posizione della Montagna", duration: 120, unit: "sec", 
+                howTo: "In piedi, alluci uniti, talloni leggermente separati. Peso distribuito su tutta la pianta del piede. Braccia rilassate lungo i fianchi con i palmi rivolti in avanti. Spalle rilassate e lontane dalle orecchie. Sguardo dritto davanti a te.",
+                baseDesc: "Allineamento piedi e colonna.", 
+                advDesc: "Attivazione archi plantari e micro-sollevamento delle rotule." 
+            },
+            { 
+                id: 'din', name: "Onda Spinale (Gatto-Mucca)", duration: 120, unit: "sec", 
+                howTo: "Posizionati a 4 zampe (mani sotto le spalle, ginocchia sotto le anche). Inspirando, inarca la schiena verso il basso e guarda in alto (Mucca). Espirando, fai una gobba spingendo la colonna verso l'alto e guarda l'ombelico (Gatto).",
+                baseDesc: "Flessione ed estensione fluida.", 
+                advDesc: "Articolazione segmentale di ogni singola vertebra." 
+            },
+            { 
+                id: 'flx', name: "Spirale di Luce (Semi-torsione)", duration: 180, unit: "sec x lato", 
+                howTo: "Seduto a terra a gambe incrociate. Appoggia la mano destra dietro la schiena e la mano sinistra sul ginocchio opposto. Inspirando allunga la colonna verso l'alto, espirando ruota il busto verso destra guardando oltre la spalla. Ripeti dall'altro lato.",
+                baseDesc: "Torsione dolce seduta.", 
+                advDesc: "Espansione toracica ad ogni inspiro, radicamento glutei ad ogni espiro." 
+            },
+            { 
+                id: 'flx2', name: "Radicamento (Ginocchio al Petto)", duration: 120, unit: "sec x gamba", 
+                howTo: "Sdraiato a pancia in su. Mantieni la gamba sinistra tesa a terra e porta il ginocchio destro verso il petto, intrecciando le mani sulla tibia. Tira dolcemente verso di te rilassando le spalle. Cambia gamba.",
+                baseDesc: "Rilascio lombare e anca.", 
+                advDesc: "Compressione attiva e allungamento della gamba opposta." 
+            },
+            { 
+                id: 'stb2', name: "Equilibrio Interiore (Albero)", duration: 90, unit: "sec x lato", 
+                howTo: "In piedi, sposta il peso sulla gamba sinistra. Solleva il piede destro e appoggialo all'interno del polpaccio o della coscia sinistra (MAI sul ginocchio). Unisci le mani a preghiera davanti al petto.",
+                baseDesc: "Fissare un punto immobile.", 
+                advDesc: "Attivazione core profondo e sguardo interno." 
+            },
+            { 
+                id: 'cns', name: "Abbandono Totale (Shavasana)", duration: 180, unit: "sec", 
+                howTo: "Sdraiato a pancia in su. Braccia leggermente distanziate dal corpo con i palmi rivolti verso l'alto. Gambe rilassate con i piedi che cadono naturalmente verso l'esterno. Rilassa ogni singolo muscolo.",
+                baseDesc: "Immobilità completa.", 
+                advDesc: "Rilascio neurale e assorbimento della pratica." 
+            }
+        ];
+
+        function getTechnicalCue(exercise) {
+            let html = `<div class="mb-4"><span class="block font-black text-gray-800 mb-1 uppercase tracking-wider text-xs">Come si esegue:</span>${exercise.howTo}</div>`;
+            html += `<div class="pt-3 border-t border-gray-200"><span class="block font-black text-[var(--zen-green)] mb-1 uppercase tracking-wider text-xs">Focus Livello Attuale:</span>`;
+            
+            if (player.level < 10) {
+                html += exercise.baseDesc;
+            } else if (player.level < 30) {
+                html += `${exercise.baseDesc} <br><span class="font-bold text-[var(--zen-accent)]">Avanzato:</span> ${exercise.advDesc}`;
+            } else {
+                html += `${exercise.advDesc} <br><span class="font-bold text-[var(--zen-fire)]">Maestria:</span> Mantieni il respiro Ujjayi e attiva i Bandha profondi.`;
+            }
+            html += `</div>`;
+            return html;
         }
 
-        function showToast(message, color = "var(--zen-green)") {
-            const container = document.getElementById('toast-container');
-            const toast = document.createElement('div');
-            toast.className = 'toast';
-            toast.style.borderLeft = `6px solid ${color}`;
-            toast.innerHTML = `<i class="fas fa-leaf mr-3" style="color: ${color}"></i> ${message}`;
-            container.appendChild(toast);
-            setTimeout(() => { toast.remove(); }, 3500);
+        // Helper functions to avoid inline HTML syntax errors
+        function showQuestInfo(id) {
+            const ex = SEQUENZA_FISSA.find(e => e.id === id);
+            if(ex) showInfo(ex.name, getTechnicalCue(ex));
         }
 
-        // --- STATE AND STORAGE ---
-        const STORAGE_PLAYER = 'zen_v5_timer_player';
-        const STORAGE_DAILY = 'zen_v5_timer_daily';
+        function showCycletteInfo() {
+            const desc = `<div class="mb-4"><span class="block font-black text-gray-800 mb-1 uppercase tracking-wider text-xs">Come si esegue:</span>Resistenza medio-bassa. Mantieni la schiena dritta e le spalle rilassate (appoggia a malapena le mani sul manubrio).<br><br>Il battito cardiaco deve salire, ma dovresti riuscire a respirare solo dal naso. Non alzarti sui pedali.</div>`;
+            showInfo('Il Cammino del Fuoco', desc);
+        }
 
-        let player = {
-            name: "YOGIN", level: 1, xp: 0, xpToNext: 200, 
-            stats: { stb: 1, flx: 1, din: 1, cns: 1 },
-            statPoints: 0, penaltyActive: false
-        };
+        function showInfo(t, d) { 
+            document.getElementById('info-title').innerText = t; 
+            document.getElementById('info-desc').innerHTML = d; 
+            document.getElementById('info-modal').classList.add('active'); 
+        }
 
-        let dailyProgress = {
-            date: null, completed: false,
-            exercises: {}, bonusQuest: null, cyclette: null 
-        };
+        function closeInfoModal() { document.getElementById('info-modal').classList.remove('active'); }
 
-        // --- TIMER LOGIC (Per-Esercizio) ---
+        // Timer Logic
         let activeInterval = null;
-        let activeKey = null; // Indica quale esercizio è in esecuzione
         let timerState = {};
 
-        function formatTime(secs) {
-            const m = Math.floor(secs / 60).toString().padStart(2, '0');
-            const s = (secs % 60).toString().padStart(2, '0');
-            return `${m}:${s}`;
-        }
-
         function startExerciseTimer(key, isCyclette = false) {
-            if (activeInterval) return showToast("Attenzione: Completa prima l'esercizio in corso.", "var(--zen-fire)");
-            playSound(sfxClick);
-
-            let data = isCyclette ? dailyProgress.cyclette : dailyProgress.exercises[key];
+            if (activeInterval) return;
+            const data = isCyclette ? dailyProgress.cyclette : dailyProgress.exercises[key];
             
-            // Analizza il tipo di esercizio basandosi sull'unità
-            let isMinutes = data.unit.includes("min");
-            let isTwoSided = data.unit.includes("lato") || data.unit.includes("gamba");
-            let targetSecs = isMinutes ? data.target * 60 : data.target;
+            let duration = 0;
+            let isTwoSided = false;
 
-            timerState = {
-                key: key,
-                isCyclette: isCyclette,
-                phase: 'prep1', // prep1, run1, prep2, run2
-                timeLeft: 3, // Countdown pre-partenza fisso a 3 secondi
-                targetSecs: targetSecs,
-                isTwoSided: isTwoSided
-            };
-
-            activeKey = key;
-            renderUI(); // Ridisegna per mostrare il timer al posto del bottone
-            activeInterval = setInterval(() => tickTimer(), 1000);
-        }
-
-        function tickTimer() {
-            timerState.timeLeft--;
-
-            // Tick sonoro durante le fasi di preparazione (ultimi 3 secondi)
-            if (timerState.timeLeft > 0 && timerState.timeLeft <= 3 && timerState.phase.includes('prep')) {
-                 playSound(sfxTick);
+            if (isCyclette) {
+                duration = 15 * 60; // 15 Minuti
+            } else {
+                const ex = SEQUENZA_FISSA.find(e => e.id === key);
+                duration = ex.duration;
+                isTwoSided = ex.unit.includes("x lato") || ex.unit.includes("x gamba");
             }
 
+            timerState = { key, isCyclette, phase: 'prep', timeLeft: 3, target: duration, isTwoSided: isTwoSided };
+            activeInterval = setInterval(tick, 1000);
+            renderUI();
+        }
+
+        function tick() {
+            timerState.timeLeft--;
             if (timerState.timeLeft <= 0) {
-                if (timerState.phase === 'prep1') {
-                    playSound(sfxStartChime); // Partenza ufficiale
-                    timerState.phase = 'run1';
-                    timerState.timeLeft = timerState.targetSecs;
-                } else if (timerState.phase === 'run1') {
-                    if (timerState.isTwoSided) {
-                        playSound(sfxStartChime); // Suono di mezzo per il cambio lato
-                        timerState.phase = 'prep2';
-                        timerState.timeLeft = 3;
-                    } else {
-                        finishExerciseTimer();
-                        return;
-                    }
+                if (timerState.phase === 'prep') {
+                    document.getElementById('sfx-start-chime').play();
+                    timerState.phase = 'run1'; timerState.timeLeft = timerState.target;
+                } else if (timerState.phase === 'run1' && timerState.isTwoSided) {
+                    document.getElementById('sfx-start-chime').play();
+                    timerState.phase = 'prep2'; timerState.timeLeft = 3;
                 } else if (timerState.phase === 'prep2') {
-                    playSound(sfxStartChime); // Ripartenza per il lato 2
-                    timerState.phase = 'run2';
-                    timerState.timeLeft = timerState.targetSecs;
-                } else if (timerState.phase === 'run2') {
-                    finishExerciseTimer();
+                    document.getElementById('sfx-start-chime').play();
+                    timerState.phase = 'run2'; timerState.timeLeft = timerState.target;
+                } else {
+                    clearInterval(activeInterval); activeInterval = null;
+                    completeEx(timerState.key, timerState.isCyclette);
                     return;
                 }
             }
-            updateActiveTimerUI();
+            updateTimerUI();
         }
 
-        function updateActiveTimerUI() {
-            let display = document.getElementById(`timer-text-${activeKey}`);
-            let progress = document.getElementById(`timer-bar-${activeKey}`);
-            if (!display) return;
+        function completeEx(key, isCyc) {
+            if(isCyc) dailyProgress.cyclette.done = true;
+            else dailyProgress.exercises[key].done = true;
+            document.getElementById('sfx-level-up').play();
+            saveData(); renderUI();
+        }
 
-            let text = "";
-            let pct = 0;
-
-            if(timerState.phase === 'prep1') {
-                text = `PREPARATI: ${timerState.timeLeft}s`;
-                pct = 0;
-            } else if(timerState.phase === 'run1' && timerState.isTwoSided) {
-                text = `LATO 1: ${formatTime(timerState.timeLeft)}`;
-                pct = 100 - ((timerState.timeLeft / timerState.targetSecs) * 100);
-            } else if(timerState.phase === 'run1' && !timerState.isTwoSided) {
-                text = `TEMPO: ${formatTime(timerState.timeLeft)}`;
-                pct = 100 - ((timerState.timeLeft / timerState.targetSecs) * 100);
-            } else if(timerState.phase === 'prep2') {
-                text = `CAMBIO LATO: ${timerState.timeLeft}s`;
-                pct = 0;
-                display.style.color = "var(--zen-fire)"; // Colore diverso per il cambio
-            } else if(timerState.phase === 'run2') {
-                text = `LATO 2: ${formatTime(timerState.timeLeft)}`;
-                pct = 100 - ((timerState.timeLeft / timerState.targetSecs) * 100);
-                display.style.color = "var(--zen-green)";
+        function updateTimerUI() {
+            const el = document.getElementById(`timer-display-${timerState.key}`);
+            if (el) {
+                if (timerState.phase.includes('prep')) {
+                    el.innerText = `PREPARATI: ${timerState.timeLeft}s`;
+                } else {
+                    const m = Math.floor(timerState.timeLeft / 60).toString().padStart(2, '0');
+                    const s = (timerState.timeLeft % 60).toString().padStart(2, '0');
+                    el.innerText = `TEMPO: ${m}:${s}`;
+                }
             }
-
-            display.innerText = text;
-            if(progress) progress.style.width = `${pct}%`;
         }
 
-        function stopExerciseTimer() {
-            playSound(sfxClick);
-            clearInterval(activeInterval);
-            activeInterval = null;
-            activeKey = null;
-            renderUI(); // Torna allo stato col pulsante Start
+        function renderQuestList() {
+            const list = document.getElementById('quest-list');
+            list.innerHTML = '';
+            SEQUENZA_FISSA.forEach(ex => {
+                const data = dailyProgress.exercises[ex.id];
+                const item = document.createElement('div');
+                item.className = "bg-white p-4 border rounded-xl shadow-sm";
+                if (timerState.key === ex.id && activeInterval) {
+                    item.innerHTML = `<div class="font-bold text-center py-2" id="timer-display-${ex.id}">...</div>`;
+                } else if (data.done) {
+                    item.innerHTML = `<div class="flex justify-between font-bold text-green-600"><span>${ex.name}</span><i class="fas fa-check"></i></div>`;
+                } else {
+                    item.innerHTML = `
+                        <div class="flex justify-between items-center mb-3">
+                            <span class="font-bold">${ex.name}</span>
+                            <i class="fas fa-info-circle info-btn text-lg" onclick="showQuestInfo('${ex.id}')"></i>
+                        </div>
+                        <button onclick="startExerciseTimer('${ex.id}')" class="w-full py-2 border rounded-lg text-sm font-bold text-green-700 hover:bg-green-50 uppercase">Inizia (${ex.duration}s${ex.unit.includes('lato') || ex.unit.includes('gamba') ? ' a lato' : ''})</button>
+                    `;
+                }
+                list.appendChild(item);
+            });
+            document.getElementById('complete-quest-btn').disabled = !SEQUENZA_FISSA.every(ex => dailyProgress.exercises[ex.id].done);
         }
 
-        function finishExerciseTimer() {
-            clearInterval(activeInterval);
-            activeInterval = null;
-            let keyToComplete = activeKey;
-            let wasCyclette = timerState.isCyclette;
-            activeKey = null;
-            
-            playSound(sfxStartChime); // Suono di completamento (campana)
-            
-            if (wasCyclette) {
-                let d = dailyProgress.cyclette;
-                d.current = d.target;
-                d.done = true;
-                const cardioXp = Math.floor(40 + (player.level * 5));
-                player.xp += cardioXp;
-                showToast(`Fuoco Alimentato! +${cardioXp} XP`, "var(--zen-fire)");
+        function renderCyclette() {
+            const cont = document.getElementById('cardio-content');
+            if (dailyProgress.cyclette.done) {
+                cont.innerHTML = `<div class="text-center font-bold text-green-600">FORGIA COMPLETATA</div>`;
+            } else if (timerState.key === 'cyclette' && activeInterval) {
+                cont.innerHTML = `<div class="text-center py-2 font-bold" id="timer-display-cyclette">...</div>`;
             } else {
-                let d = dailyProgress.exercises[keyToComplete];
-                d.current = d.target;
-                d.done = true;
+                cont.innerHTML = `
+                    <div class="flex justify-between items-center mb-3">
+                        <span class="font-bold">Pedalata Rigenerante</span>
+                        <i class="fas fa-info-circle info-btn text-lg" onclick="showCycletteInfo()"></i>
+                    </div>
+                    <button onclick="startExerciseTimer('cyclette', true)" class="w-full py-2 bg-white border border-red-200 text-red-500 rounded-lg font-bold">AVVIA 15 MIN</button>
+                `;
             }
-            saveData();
-            renderUI();
-        }
-
-        // Completa manualmente (per esercizi a reps o per saltare il timer)
-        function forceCompleteExercise(key, isCyclette = false) {
-            playSound(sfxClick);
-            if (isCyclette) {
-                let d = dailyProgress.cyclette;
-                d.current = d.target;
-                d.done = true;
-                const cardioXp = Math.floor(40 + (player.level * 5));
-                player.xp += cardioXp;
-                showToast(`Fuoco Alimentato! +${cardioXp} XP`, "var(--zen-fire)");
-            } else {
-                let d = dailyProgress.exercises[key];
-                d.current = d.target;
-                d.done = true;
-            }
-            saveData();
-            renderUI();
-        }
-
-        // --- INFO MODAL ---
-        function showInfo(title, desc) {
-            playSound(sfxClick);
-            document.getElementById('info-title').innerText = title;
-            document.getElementById('info-desc').innerHTML = desc;
-            document.getElementById('info-modal').classList.add('active');
-        }
-
-        function closeInfoModal() {
-            playSound(sfxClick);
-            document.getElementById('info-modal').classList.remove('active');
-        }
-
-        // --- INFINITE LIBRARY DB ---
-        const EXERCISE_LIBRARY = {
-            stb: [ 
-                { req: 0, pool: [
-                    { name: "Guerriero III (Equilibrio a T)", base: 30, inc: 5, unit: "sec x gamba", desc: "Equilibrio a 'T'. Busto e gamba sollevata paralleli al suolo. <br><br><span style='color: var(--zen-green)' class='font-bold'>Salva-spalle:</span> Braccia stese lungo i fianchi (verso i piedi) come ali aerodinamiche." },
-                    { name: "Mezza Luna (Equilibrio 1 mano/1 piede)", base: 30, inc: 5, unit: "sec x lato", desc: "Equilibrio su una gamba e una mano a terra (o su blocco). Bacino aperto lateralmente. <br><br><span style='color: var(--zen-green)' class='font-bold'>Salva-spalle:</span> Il braccio che andrebbe in alto riposa sul fianco." },
-                    { name: "Aquila (Garudasana - Solo gambe)", base: 45, inc: 5, unit: "sec x lato", desc: "Piega le ginocchia, incrocia la coscia sopra l'altra e aggancia il piede. <br><br><span style='color: var(--zen-green)' class='font-bold'>Salva-spalle:</span> Non intrecciare le braccia, tienile unite in preghiera al petto." }
-                ]},
-                { req: 15, pool: [
-                    { name: "Shiva Squat (Gamba incrociata dietro)", base: 10, inc: 1, unit: "reps x lato", desc: "In equilibrio su una gamba, piega il ginocchio e porta l'altro ginocchio a sfiorare il polpaccio posteriore. Risali." },
-                    { name: "Pistol Squat Assistiti", base: 8, inc: 1, unit: "reps x lato", desc: "Squat profondo su una gamba sola. Usa lo stipite di una porta o una sedia per equilibrio." },
-                    { name: "Danzatore (Natarajasana)", base: 45, inc: 5, unit: "sec x lato", desc: "Afferra la caviglia dietro di te. Spingi il piede nella mano e inclinati in avanti. Usa solo il braccio necessario per afferrare." }
-                ]}
-            ],
-            flx: [ 
-                { req: 0, pool: [
-                    { name: "Lucertola (Lizard Pose)", base: 45, inc: 5, unit: "sec x lato", desc: "Affondo molto ampio. Entrambe le mani all'interno del piede anteriore. Scendi sugli avambracci se puoi per apertura estrema dell'anca." },
-                    { name: "Pinza Seduta (Paschimottanasana)", base: 60, inc: 10, unit: "sec", desc: "Gambe tese in avanti, flettiti dal bacino per afferrare i piedi. Non forzare con le braccia o le spalle." },
-                    { name: "Testa al Ginocchio (Janu Sirsasana)", base: 45, inc: 5, unit: "sec x lato", desc: "Una gamba tesa, l'altra piegata con piede all'interno coscia. Flettiti morbidamente sulla gamba tesa." }
-                ]},
-                { req: 15, pool: [
-                    { name: "Piccione Reale (Kapotasana)", base: 60, inc: 10, unit: "sec x lato", desc: "Ginocchio piegato davanti a terra, gamba tesa indietro. Flettiti in avanti. Rilascio profondo del nervo sciatico." },
-                    { name: "Piegamento a gambe tese (Prasarita)", base: 90, inc: 10, unit: "sec", desc: "In piedi, gambe molto divaricate. Scendi in avanti col busto dal bacino finché le mani toccano terra." },
-                    { name: "Mezza Spaccata (Ardha Hanumanasana)", base: 45, inc: 5, unit: "sec x lato", desc: "In ginocchio. Stendi una gamba dritta davanti, tallone a terra. Flettiti sulla gamba tesa." }
-                ]}
-            ],
-            din: [  
-                { req: 0, pool: [
-                    { name: "Transizioni Skandasana (Affondi laterali)", base: 12, inc: 1, unit: "reps", desc: "Affondo profondo su una gamba. Strisciando bassissimo, spostati in affondo sull'altra gamba. Movimento fluido stile ninja." },
-                    { name: "Saluto alla Luna (Chandra Namaskar)", base: 3, inc: 1, unit: "cicli completi", desc: "Sequenza fluida circolare di affondi laterali e squat profondi. Rispetta il ritmo respiratorio dolce." },
-                    { name: "Rollbacks (Dalla schiena ad accosciata)", base: 10, inc: 1, unit: "reps", desc: "Seduto. Rotola indietro sulla schiena e, sfruttando lo slancio, torna su in accosciata senza usare le mani." }
-                ]},
-                { req: 15, pool: [
-                    { name: "Flow Avanzato (Guerriero->Mezzaluna->Skandasana)", base: 4, inc: 1, unit: "flow completi", desc: "Collega le posizioni senza appoggiare mani a terra o fermarti. Sfida totale di equilibrio e fluidità." },
-                    { name: "Ponte Dinamico (Setu Bandha continuo)", base: 20, inc: 2, unit: "reps lente", desc: "Supino, solleva il bacino contraendo i glutei, scendi sfiorando terra e risali. Movimento lento e continuo." }
-                ]}
-            ],
-            cns: [ 
-                { req: 0, pool: [
-                    { name: "Respiro a Narici Alternate (Nadi Shodhana)", base: 4, inc: 0.5, unit: "min", desc: "Chiudi narice destra, inspira da sinistra. Chiudi sinistra, espira da destra. E viceversa. Riequilibra l'energia." },
-                    { name: "Savasana Consapevole (Body Scan)", base: 5, inc: 1, unit: "min", desc: "Sdraiato. Contrai i muscoli dei piedi per 3 secondi e rilascia. Sali lungo tutto il corpo fino ai muscoli del viso." },
-                    { name: "Equilibrio cieco (Albero ad occhi chiusi)", base: 40, inc: 5, unit: "sec x lato", desc: "Posizione dell'Albero classica (mani al petto), ma con gli occhi completamente chiusi. Usa la propriocezione profonda." }
-                ]},
-                { req: 15, pool: [
-                    { name: "Meditazione senza oggetto (Silenzio)", base: 10, inc: 1, unit: "min", desc: "Seduto immobile. Lascia emergere pensieri ed emozioni, osservali come se fossero nuvole passeggere e lasciali andare." },
-                    { name: "Respirazione a Mantice (Bhastrika)", base: 3, inc: 0.5, unit: "min", desc: "Inspirazioni ed espirazioni rapide e forzate dal naso, muovendo vigorosamente l'addome. Scalda il corpo intensamente." }
-                ]}
-            ]
-        };
-
-        const CYCLETTE_POOL = [
-            { name: "LISS Brucia Grassi", base: 30, inc: 0.5, desc: "Resistenza media. Mantieni il battito al 65-70%. Respiro controllato. Smonta le cellule di grasso senza stressare il sistema nervoso." },
-            { name: "Interval Training 1:1", base: 20, inc: 0.5, desc: "1 min veloce/duro, 1 min lento/leggero per recuperare. Alterna fino alla fine. Eccellente scossa metabolica." },
-            { name: "HIIT Metabolico", base: 15, inc: 0.5, desc: "30 sec di SPRINT MASSIMO al 100%, 90 sec di recupero lentissimo. Condizionamento estremo post-combustione." },
-            { name: "Fartlek Libero", base: 25, inc: 0.5, desc: "Cambia ritmo e resistenza in modo casuale o seguendo i cambi di una playlist musicale. Gioca con l'intensità." },
-            { name: "Pedalata Piramidale", base: 30, inc: 0.5, desc: "Aumenta la resistenza di 1 tacca ogni 5 minuti fino a metà del tempo totale, poi diminuiscila simmetricamente fino alla fine." }
-        ];
-
-        const BONUS_MISSIONS = [
-            { text: "Fai 10 respiri profondi vicino a una finestra aperta.", desc: "Porta ossigeno fresco al cervello per resettare la mente e migliorare il focus." },
-            { text: "Bevi un bicchiere d'acqua consapevolmente.", desc: "Senti la temperatura e il percorso dell'acqua nel corpo. Nessuna distrazione digitale mentre bevi." },
-            { text: "Cammina a piedi nudi in casa per 5 minuti.", desc: "Riattiva le terminazioni nervose della pianta del piede, cruciali per il radicamento e l'equilibrio." },
-            { text: "Massaggiati collo e trapezio per 2 minuti.", desc: "Rilascia le tensioni muscolari accumulate nella parte alta del corpo, dove spesso scarichiamo lo stress." }
-        ];
-
-        const ICONS = { stb: "fa-mountain", flx: "fa-water", din: "fa-fire", cns: "fa-om" };
-        
-        // --- INIZIALIZZAZIONE ---
-        function init() {
-            loadData();
-            checkDateLogic();
-            renderUI();
-        }
-
-        function toggleSettings() {
-            playSound(sfxClick);
-            document.getElementById('settings-panel').classList.toggle('hidden');
-        }
-
-        function saveData() {
-            localStorage.setItem(STORAGE_PLAYER, JSON.stringify(player));
-            localStorage.setItem(STORAGE_DAILY, JSON.stringify(dailyProgress));
-        }
-
-        function loadData() {
-            const savedPlayer = localStorage.getItem(STORAGE_PLAYER);
-            const savedDaily = localStorage.getItem(STORAGE_DAILY);
-            if (savedPlayer) player = JSON.parse(savedPlayer);
-            if (savedDaily) dailyProgress = JSON.parse(savedDaily);
-
-            if(dailyProgress && !dailyProgress.cyclette && !dailyProgress.completed) {
-                generateCycletteQuest();
-                saveData(); 
-            }
-        }
-
-        function exportData() {
-            playSound(sfxClick);
-            const data = { player, dailyProgress };
-            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(data));
-            const downloadAnchorNode = document.createElement('a');
-            downloadAnchorNode.setAttribute("href", dataStr);
-            downloadAnchorNode.setAttribute("download", "zen_system_backup.json");
-            document.body.appendChild(downloadAnchorNode);
-            downloadAnchorNode.click();
-            downloadAnchorNode.remove();
-            showToast("Backup salvato.");
-        }
-
-        function importData(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                try {
-                    const data = JSON.parse(e.target.result);
-                    if (data.player && data.player.level) {
-                        player = data.player;
-                        if(data.dailyProgress) dailyProgress = data.dailyProgress;
-                        saveData();
-                        playSound(sfxLevelUp);
-                        showToast("Sistema ripristinato.");
-                        setTimeout(() => location.reload(), 1500);
-                    } else showToast("File corrotto.", "var(--zen-fire)");
-                } catch (err) { showToast("Errore I/O.", "var(--zen-fire)"); }
-            };
-            reader.readAsText(file);
         }
 
         function checkDateLogic() {
             const today = new Date().toDateString();
-            if (!dailyProgress.date) {
-                dailyProgress.date = today;
-                generateDailyQuest();
-                saveData(); 
-                return;
-            }
             if (dailyProgress.date !== today) {
-                if (!dailyProgress.completed && !player.penaltyActive) {
-                    player.penaltyActive = true;
-                }
-                dailyProgress.date = today;
-                dailyProgress.completed = false;
-                // Ferma eventuali timer vecchi se rimasti aperti da ieri
-                if(activeInterval) stopExerciseTimer();
-                
-                generateDailyQuest();
+                dailyProgress.date = today; dailyProgress.completed = false; dailyProgress.cyclette.done = false;
+                SEQUENZA_FISSA.forEach(ex => dailyProgress.exercises[ex.id] = { done: false });
                 saveData();
-            }
-        }
-
-        function getRandomAsana(type) {
-            const tiers = EXERCISE_LIBRARY[type];
-            let bestTier = tiers[0];
-            for (let i = tiers.length - 1; i >= 0; i--) {
-                if (player.stats[type] >= tiers[i].req) {
-                    bestTier = tiers[i];
-                    break;
-                }
-            }
-            const pool = bestTier.pool;
-            return pool[Math.floor(Math.random() * pool.length)];
-        }
-
-        function generateCycletteQuest() {
-            const randomCardio = CYCLETTE_POOL[Math.floor(Math.random() * CYCLETTE_POOL.length)];
-            let target = Math.floor(randomCardio.base + (player.level * randomCardio.inc));
-            if (target > 50) target = 50;
-
-            dailyProgress.cyclette = {
-                name: randomCardio.name,
-                desc: randomCardio.desc,
-                target: target,
-                current: 0,
-                unit: "min",
-                done: false
-            };
-        }
-
-        function generateDailyQuest() {
-            dailyProgress.exercises = {};
-            for (let type in EXERCISE_LIBRARY) {
-                const asana = getRandomAsana(type);
-                let quantity = Math.floor(asana.base + ((player.level - 1) * asana.inc)); 
-                dailyProgress.exercises[type] = {
-                    name: asana.name,
-                    desc: asana.desc,
-                    target: quantity, 
-                    current: 0,
-                    unit: asana.unit, 
-                    done: false
-                };
-            }
-            if (Math.random() < 0.50) { 
-                const randomQuest = BONUS_MISSIONS[Math.floor(Math.random() * BONUS_MISSIONS.length)];
-                dailyProgress.bonusQuest = { text: randomQuest.text, desc: randomQuest.desc, done: false };
-            } else {
-                dailyProgress.bonusQuest = null;
-            }
-            generateCycletteQuest();
-        }
-
-        let penaltySeconds = 120;
-        function startPenaltyTimer() {
-            playSound(sfxClick);
-            document.getElementById('start-penalty-btn').disabled = true;
-            const timerEl = document.getElementById('penalty-timer');
-            const interval = setInterval(() => {
-                penaltySeconds--;
-                const m = Math.floor(penaltySeconds/60).toString().padStart(2,'0');
-                const s = (penaltySeconds%60).toString().padStart(2,'0');
-                timerEl.innerText = `${m}:${s}`;
-                if(penaltySeconds<=0) {
-                    clearInterval(interval);
-                    playSound(sfxLevelUp);
-                    showToast("Riallineamento completato.");
-                    player.penaltyActive = false;
-                    saveData();
-                    setTimeout(() => location.reload(), 1500);
-                }
-            }, 1000);
-        }
-
-        // --- MAIN RENDER ---
-        function renderUI() {
-            document.getElementById('level-display').innerText = player.level;
-            document.getElementById('stb-val').innerText = player.stats.stb;
-            document.getElementById('flx-val').innerText = player.stats.flx;
-            document.getElementById('din-val').innerText = player.stats.din;
-            document.getElementById('cns-val').innerText = player.stats.cns;
-            
-            const xpPercent = Math.min(100, (player.xp / player.xpToNext) * 100);
-            document.getElementById('xp-bar').style.width = `${xpPercent}%`;
-
-            const titleEl = document.getElementById('player-title');
-            if (player.level < 10) titleEl.innerText = "Seme (Avanzato)";
-            else if (player.level < 25) titleEl.innerText = "Radice (Esperto)";
-            else if (player.level < 40) titleEl.innerText = "Fusto (Maestro)";
-            else titleEl.innerText = "Fioritura (Risvegliato)";
-
-            if (player.penaltyActive) {
-                document.getElementById('penalty-overlay').classList.remove('hidden');
-            } else {
-                document.getElementById('penalty-overlay').classList.add('hidden');
-                
-                const bonusPanel = document.getElementById('bonus-quest-panel');
-                if (dailyProgress.bonusQuest && !dailyProgress.bonusQuest.done && !dailyProgress.completed) {
-                    bonusPanel.classList.remove('hidden');
-                    document.getElementById('bonus-quest-desc').innerText = `"${dailyProgress.bonusQuest.text}"`;
-                    document.getElementById('bonus-info-btn').onclick = () => showInfo('Intenzione', dailyProgress.bonusQuest.desc);
-                } else {
-                    bonusPanel.classList.add('hidden');
-                }
-
-                const cardioPanel = document.getElementById('cardio-panel');
-                if (dailyProgress.cyclette && !dailyProgress.completed) {
-                    cardioPanel.classList.remove('hidden');
-                    renderCyclette();
-                } else {
-                    cardioPanel.classList.add('hidden');
-                }
-
-                if (dailyProgress.completed) {
-                    document.getElementById('quest-list').classList.add('hidden');
-                    document.getElementById('quest-status-area').classList.add('hidden');
-                    document.getElementById('quest-completed-msg').classList.remove('hidden');
-                } else {
-                    document.getElementById('quest-list').classList.remove('hidden');
-                    document.getElementById('quest-status-area').classList.remove('hidden');
-                    document.getElementById('quest-completed-msg').classList.add('hidden');
-                    renderQuestList();
-                }
-            }
-        }
-
-        // --- RENDER CYCLETTE (Con Timer Integrato) ---
-        function renderCyclette() {
-            const container = document.getElementById('cardio-content');
-            const data = dailyProgress.cyclette;
-            if(data.done) {
-                container.innerHTML = `<div class="text-center font-bold text-lg uppercase tracking-wider" style="color: var(--zen-fire);"><i class="fas fa-check-circle"></i> Fuoco Alimentato</div>`;
-                return;
-            }
-
-            // Se questo esercizio è il timer attivo
-            if (activeKey === 'cyclette') {
-                container.innerHTML = `
-                    <div class="timer-active-box flex-col sm:flex-row gap-3 mb-2" style="background-color: #fff1f2; border-color: #fecdd3;">
-                        <div class="flex items-center gap-3 w-full sm:w-auto">
-                            <i class="fas fa-bicycle text-2xl" style="color: var(--zen-fire)"></i>
-                            <span class="font-bold text-gray-800 text-lg">${data.name}</span>
-                        </div>
-                        <div class="flex items-center gap-4 w-full sm:w-auto justify-between sm:justify-end">
-                            <span id="timer-text-cyclette" class="font-mono text-xl font-black" style="color: var(--zen-fire)">Prep: 3s</span>
-                            <button onclick="stopExerciseTimer()" class="px-4 py-2 border border-red-200 bg-white rounded font-bold text-red-500 hover:bg-red-50 transition-colors"><i class="fas fa-stop"></i></button>
-                        </div>
-                    </div>
-                `;
-                return;
-            }
-
-            // Vista Normale
-            container.innerHTML = `
-                <div class="flex justify-between items-center mb-4 relative z-10">
-                    <div class="flex items-center gap-4">
-                        <i class="fas fa-info-circle info-btn text-2xl" onclick="showInfo('${data.name}', '${data.desc.replace(/'/g, "\\'")}')"></i>
-                        <div>
-                            <span class="font-bold text-gray-800 block text-lg tracking-wide leading-tight pr-2">${data.name}</span>
-                        </div>
-                    </div>
-                    <span class="font-mono text-xl font-black text-gray-800 ml-2 whitespace-nowrap">${data.target} <span class="text-xs font-sans text-gray-500 font-bold uppercase">${data.unit}</span></span>
-                </div>
-                <div class="flex gap-2 justify-end w-full">
-                    <button onclick="startExerciseTimer('cyclette', true)" class="w-full py-3 bg-white border border-gray-200 rounded-lg font-bold hover:bg-gray-50 transition-colors text-lg" style="color: var(--zen-fire)"><i class="fas fa-play mr-2"></i> Avvia Timer</button>
-                    <button onclick="forceCompleteExercise('cyclette', true)" class="px-4 py-3 bg-white border border-gray-200 rounded-lg font-bold text-gray-400 hover:bg-gray-50 transition-colors" title="Segna Completato Senza Timer"><i class="fas fa-check"></i></button>
-                </div>
-            `;
-        }
-
-        // --- RENDER QUESTS (Con Timer Integrato e Distinzione Reps/Time) ---
-        function renderQuestList() {
-            const list = document.getElementById('quest-list');
-            list.innerHTML = '';
-            let allDone = true;
-
-            for (let key in dailyProgress.exercises) {
-                const data = dailyProgress.exercises[key];
-                if (!data.done) allDone = false;
-                const iconClass = ICONS[key];
-                
-                const item = document.createElement('div');
-                item.className = "bg-white p-5 border border-gray-200 rounded-xl shadow-sm mb-4 relative overflow-hidden";
-                
-                // Se questo è il timer attivo
-                if (activeKey === key) {
-                    item.innerHTML = `
-                        <div class="timer-active-box flex-col sm:flex-row gap-3">
-                            <div class="flex items-center gap-3 w-full sm:w-auto">
-                                <i class="fas ${iconClass} text-2xl" style="color: var(--zen-green)"></i>
-                                <span class="font-bold text-gray-800 text-lg leading-tight">${data.name}</span>
-                            </div>
-                            <div class="flex items-center gap-4 w-full sm:w-auto justify-between sm:justify-end">
-                                <span id="timer-text-${key}" class="font-mono text-xl font-black" style="color: var(--zen-green)">Prep: 3s</span>
-                                <button onclick="stopExerciseTimer()" class="px-4 py-2 border border-red-200 bg-white rounded font-bold text-red-500 hover:bg-red-50 transition-colors"><i class="fas fa-stop"></i></button>
-                            </div>
-                        </div>
-                    `;
-                } 
-                // Se è completato o non è il timer attivo
-                else {
-                    let isTimeBased = data.unit.includes("sec") || data.unit.includes("min");
-                    
-                    let actionArea = "";
-                    if (data.done) {
-                        actionArea = `<div class="text-right w-full font-bold uppercase tracking-wider" style="color: var(--zen-green)"><i class="fas fa-check-circle"></i> Fatto</div>`;
-                    } else if (isTimeBased) {
-                        actionArea = `
-                            <button onclick="startExerciseTimer('${key}', false)" class="flex-1 py-2 border border-gray-200 rounded-lg font-bold hover:bg-gray-50 transition-colors text-md" style="color: var(--zen-green)"><i class="fas fa-play mr-2"></i> INIZIA TIMER</button>
-                            <button onclick="forceCompleteExercise('${key}', false)" class="px-4 py-2 border border-gray-200 rounded-lg text-gray-400 hover:bg-gray-50 transition-colors" title="Segna Completato"><i class="fas fa-check"></i></button>
-                        `;
-                    } else {
-                        actionArea = `
-                            <button onclick="forceCompleteExercise('${key}', false)" class="w-full py-2 border border-gray-200 rounded-lg font-bold hover:bg-gray-50 transition-colors text-md tracking-wider uppercase" style="color: var(--zen-green); background-color: transparent;"><i class="fas fa-check mr-2"></i> Segna Completato</button>
-                        `;
-                    }
-
-                    item.innerHTML = `
-                        <div class="flex justify-between items-center mb-4 relative z-10">
-                            <div class="flex items-center gap-4">
-                                <i class="fas fa-info-circle info-btn text-2xl" onclick="showInfo('${data.name}', '${data.desc.replace(/'/g, "\\'")}')"></i>
-                                <div>
-                                    <span class="font-bold text-gray-800 block text-lg pr-2 leading-tight tracking-wide">${data.name}</span>
-                                </div>
-                            </div>
-                            <span class="font-mono text-xl font-black text-gray-800 ml-2 whitespace-nowrap">${data.target} <span class="text-xs font-sans text-gray-500 font-bold uppercase">${data.unit}</span></span>
-                        </div>
-                        <div class="flex gap-2 w-full mt-2 relative z-10">
-                            ${actionArea}
-                        </div>
-                    `;
-                }
-                list.appendChild(item);
-            }
-
-            const completeBtn = document.getElementById('complete-quest-btn');
-            completeBtn.disabled = !allDone || activeKey !== null; // Disabilita anche se un timer è in corso
-            if (allDone) {
-                completeBtn.style.backgroundColor = "var(--zen-green)";
-                completeBtn.style.color = "#fff";
-                completeBtn.style.boxShadow = "0 6px 15px rgba(96, 128, 107, 0.3)";
-            } else {
-                completeBtn.style.backgroundColor = "transparent";
-                completeBtn.style.color = "var(--zen-green)";
-                completeBtn.style.boxShadow = "none";
-            }
-        }
-
-        // --- AZIONI ---
-        function completeBonusQuest() {
-            playSound(sfxClick);
-            if(dailyProgress.bonusQuest) {
-                dailyProgress.bonusQuest.done = true;
-                const bonusXp = Math.floor(30 + (player.level * 3));
-                player.xp += bonusXp;
-                playSound(sfxCrit);
-                showToast(`Intenzione completata. +${bonusXp} XP`, "var(--zen-accent)");
-                saveData();
-                renderUI();
             }
         }
 
         function finishDailyQuest() {
-            dailyProgress.completed = true;
-            playSound(sfxLevelUp);
-            
-            let xpGain = Math.floor(60 + (player.level * 10)); 
+            dailyProgress.completed = true; player.xp += 100;
+            if (player.xp >= player.xpToNext) { player.level++; player.xp = 0; Object.keys(player.stats).forEach(s => player.stats[s]++); }
+            saveData(); renderUI();
+            alert("Pratica conclusa. Il tuo corpo ha assimilato la maestria.");
+        }
 
-            player.xp += xpGain;
-            player.statPoints += 3;
-            
-            if (player.xp >= player.xpToNext) {
-                player.level++;
-                player.xp -= player.xpToNext;
-                player.xpToNext = Math.floor(player.xpToNext * 1.25);
-                player.stats.stb++; player.stats.flx++;
-                player.stats.din++; player.stats.cns++;
+        function renderUI() {
+            document.getElementById('level-display').innerText = player.level;
+            document.getElementById('xp-bar').style.width = `${(player.xp/player.xpToNext)*100}%`;
+            Object.keys(player.stats).forEach(s => document.getElementById(`${s}-val`).innerText = player.stats[s]);
+            if (dailyProgress.completed) {
+                document.getElementById('quest-list').innerHTML = `<div class="text-center py-10 font-bold text-gray-400 uppercase">Pratica Completata. Riposa.</div>`;
+                document.getElementById('complete-quest-btn').classList.add('hidden');
+            } else {
+                renderQuestList(); renderCyclette();
             }
-
-            saveData();
-            renderUI();
-            
-            document.getElementById('xp-gain-display').innerText = `+${xpGain}`;
-            document.getElementById('reward-modal').classList.add('active');
         }
 
-        function closeModal() {
-            playSound(sfxClick);
-            document.getElementById('reward-modal').classList.remove('active');
-            location.reload(); 
+        function saveData() { localStorage.setItem(STORAGE_PLAYER, JSON.stringify(player)); localStorage.setItem(STORAGE_DAILY, JSON.stringify(dailyProgress)); }
+        function loadData() {
+            const p = localStorage.getItem(STORAGE_PLAYER); const d = localStorage.getItem(STORAGE_DAILY);
+            if (p) player = JSON.parse(p); if (d) dailyProgress = JSON.parse(d);
+        }
+        function toggleSettings() { document.getElementById('settings-panel').classList.toggle('hidden'); }
+        function exportData() { 
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({player, dailyProgress}));
+            const dl = document.createElement('a'); dl.setAttribute("href", dataStr); dl.setAttribute("download", "zen_mastery.json"); dl.click();
         }
 
-        init();
+        loadData(); checkDateLogic(); renderUI();
     </script>
 </body>
 </html>
